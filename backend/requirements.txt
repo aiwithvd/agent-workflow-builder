@@ -31,6 +31,7 @@ openweathermap==1.0.1
 
 # Redis
 redis==5.0.1
+redis[asyncio]==5.0.1
 hiredis==2.2.3
 
 # Testing

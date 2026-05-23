@@ -1,0 +1,77 @@
+{
+  "name": "Research & Report Pipeline",
+  "description": "Gathers information from multiple sources and compiles a structured report",
+  "template_name": "research_report",
+  "graph_definition": {
+    "nodes": [
+      {
+        "id": "input",
+        "type": "input",
+        "data": {
+          "label": "User Input",
+          "description": "User's research query"
+        },
+        "position": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "id": "researcher",
+        "type": "agent",
+        "data": {
+          "label": "Researcher Agent",
+          "agentId": null,
+          "role": "Research Analyst",
+          "tools": ["web_search", "calculator"]
+        },
+        "position": {
+          "x": 200,
+          "y": 0
+        }
+      },
+      {
+        "id": "writer",
+        "type": "agent",
+        "data": {
+          "label": "Writer Agent",
+          "agentId": null,
+          "role": "Report Writer",
+          "tools": ["file_write"]
+        },
+        "position": {
+          "x": 400,
+          "y": 0
+        }
+      },
+      {
+        "id": "output",
+        "type": "output",
+        "data": {
+          "label": "Final Report"
+        },
+        "position": {
+          "x": 600,
+          "y": 0
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "input->researcher",
+        "source": "input",
+        "target": "researcher"
+      },
+      {
+        "id": "researcher->writer",
+        "source": "researcher",
+        "target": "writer"
+      },
+      {
+        "id": "writer->output",
+        "source": "writer",
+        "target": "output"
+      }
+    ]
+  }
+}

@@ -1,0 +1,127 @@
+{
+  "name": "Customer Support Triage",
+  "description": "Routes support requests to appropriate specialist agents based on category",
+  "template_name": "customer_support",
+  "graph_definition": {
+    "nodes": [
+      {
+        "id": "input",
+        "type": "input",
+        "data": {
+          "label": "Support Request"
+        },
+        "position": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "id": "classifier",
+        "type": "agent",
+        "data": {
+          "label": "Classifier Agent",
+          "agentId": null,
+          "role": "Support Classifier",
+          "tools": ["web_search"]
+        },
+        "position": {
+          "x": 200,
+          "y": 0
+        }
+      },
+      {
+        "id": "technical",
+        "type": "agent",
+        "data": {
+          "label": "Technical Support",
+          "agentId": null,
+          "role": "Technical Support Specialist",
+          "tools": ["web_search", "calculator"]
+        },
+        "position": {
+          "x": 400,
+          "y": -100
+        }
+      },
+      {
+        "id": "billing",
+        "type": "agent",
+        "data": {
+          "label": "Billing Support",
+          "agentId": null,
+          "role": "Billing Specialist",
+          "tools": ["calculator"]
+        },
+        "position": {
+          "x": 400,
+          "y": 0
+        }
+      },
+      {
+        "id": "general",
+        "type": "agent",
+        "data": {
+          "label": "General Support",
+          "agentId": null,
+          "role": "Support Agent",
+          "tools": ["web_search"]
+        },
+        "position": {
+          "x": 400,
+          "y": 100
+        }
+      },
+      {
+        "id": "output",
+        "type": "output",
+        "data": {
+          "label": "Resolution"
+        },
+        "position": {
+          "x": 600,
+          "y": 0
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "input->classifier",
+        "source": "input",
+        "target": "classifier"
+      },
+      {
+        "id": "classifier->technical",
+        "source": "classifier",
+        "target": "technical",
+        "label": "technical"
+      },
+      {
+        "id": "classifier->billing",
+        "source": "classifier",
+        "target": "billing",
+        "label": "billing"
+      },
+      {
+        "id": "classifier->general",
+        "source": "classifier",
+        "target": "general",
+        "label": "general"
+      },
+      {
+        "id": "technical->output",
+        "source": "technical",
+        "target": "output"
+      },
+      {
+        "id": "billing->output",
+        "source": "billing",
+        "target": "output"
+      },
+      {
+        "id": "general->output",
+        "source": "general",
+        "target": "output"
+      }
+    ]
+  }
+}
