@@ -1,6 +1,12 @@
 # Yuno AI Agent Orchestration Platform
 
-A full-stack platform for creating, configuring, and orchestrating AI agents into collaborative workflows. Agents run on a real LangGraph runtime, execute real tools, and communicate asynchronously to complete complex tasks.
+A production-ready full-stack platform for creating, configuring, and orchestrating AI agents into collaborative workflows. Agents run on a real LangGraph runtime, execute real tools, and communicate asynchronously to complete complex tasks.
+
+**Status**: ✅ MVP Complete (Phases 1-5)
+- Backend: FastAPI + LangGraph + Supabase + Redis
+- Frontend: Next.js + React Flow + Tailwind CSS  
+- Telegram Integration: Real-time agent communication
+- Demo Ready: Pre-built workflows + sample agents
 
 ## 🎯 Key Features
 
@@ -52,19 +58,43 @@ cp .env.example .env
 # - OpenWeatherMap API key (optional, for weather tool)
 ```
 
-### Running Locally
+### Running Locally (Quickstart)
+
+**Option 1: Docker Compose (Recommended)**
 
 ```bash
-# Start Redis (if not already running)
+# Start Redis
 redis-server
 
-# Start all services via Docker
-docker-compose up
+# Copy and configure environment
+cp .env.example .env
+# Edit .env with your Supabase credentials and bot token
 
-# Or run individually:
-# Backend: python -m uvicorn app.main:app --reload (from backend/)
-# Frontend: npm run dev (from frontend/)
-# Telegram Bot: python -m app.telegram.bot (from backend/)
+# Start all services
+docker-compose up
+```
+
+**Option 2: Local Development**
+
+```bash
+# Terminal 1: Backend API
+cd backend
+pip install -r requirements.txt
+alembic upgrade head
+python seed_templates.py
+python -m uvicorn app.main:app --reload
+
+# Terminal 2: Telegram Bot
+cd backend
+python -m app.telegram.bot
+
+# Terminal 3: Frontend
+cd frontend
+npm install
+npm run dev
+
+# Terminal 4: Redis (if not already running)
+redis-server
 ```
 
 Access the application at:

@@ -1,6 +1,6 @@
 """LLM factory for creating language models based on provider."""
 
-from langchain_core.language_model.llm import BaseLLM
+from langchain_core.language_models import BaseChatModel
 from langchain_ollama import ChatOllama
 from langchain_openai import ChatOpenAI
 
@@ -8,7 +8,7 @@ from app.config import settings
 from app.enums import LLMProvider
 
 
-def create_llm(provider: LLMProvider | str, model: str) -> BaseLLM:
+def create_llm(provider: LLMProvider | str, model: str) -> BaseChatModel:
     """Create an LLM instance based on provider and model name.
 
     Args:
