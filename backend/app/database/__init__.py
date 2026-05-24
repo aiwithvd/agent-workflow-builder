@@ -9,6 +9,7 @@ engine = create_async_engine(
     echo=settings.debug,
     future=True,
     pool_pre_ping=True,
+    connect_args={"ssl": "require"},
 )
 
 # Session maker
