@@ -1,4 +1,4 @@
-# Yuno AI Platform - Testing & Verification Guide
+# Agent Orchestration Platform - Testing & Verification Guide
 
 ## Functional Requirements Checklist
 
@@ -92,7 +92,7 @@ Input → Classifier (analyzes type) → {
 
 ### ✅ 5. External Channel Integration (Telegram)
 
-**Test Telegram Bot**: `@YunoAI_Bot` (requires token in .env)
+**Test Telegram Bot**: `@AgeOrcBot` (requires token in .env)
 
 **Implementation**:
 - `backend/app/telegram/bot.py` - Bot setup with polling

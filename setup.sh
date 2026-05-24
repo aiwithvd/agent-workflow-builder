@@ -2,7 +2,7 @@
 
 set -e
 
-echo "🚀 Yuno AI Agent Orchestration Platform - Setup"
+echo "🚀 Agent Orchestration Platform - Setup"
 echo "=============================================="
 echo ""
 

@@ -16,7 +16,7 @@ services:
     command: >
       sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
     networks:
-      - yuno-network
+      - agent-orchestration-network
 
   telegram-bot:
     build:
@@ -29,7 +29,7 @@ services:
       - backend
     command: python -m app.telegram.bot
     networks:
-      - yuno-network
+      - agent-orchestration-network
 
   frontend:
     build:
@@ -44,11 +44,11 @@ services:
     depends_on:
       - backend
     networks:
-      - yuno-network
+      - agent-orchestration-network
 
 volumes:
   agent_files:
 
 networks:
-  yuno-network:
+  agent-orchestration-network:
     driver: bridge

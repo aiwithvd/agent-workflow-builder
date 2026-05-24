@@ -3,7 +3,7 @@ import Link from "next/link";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Yuno AI - Agent Orchestration Platform",
+  title: "Agent Orchestration Platform",
   description:
     "Create, configure, and orchestrate AI agents into collaborative workflows",
 };
@@ -22,7 +22,7 @@ export default function RootLayout({
             <nav className="container flex items-center justify-between py-4">
               <div className="flex items-center gap-8">
                 <Link href="/" className="text-2xl font-bold text-primary">
-                  🤖 Yuno AI
+                  🤖 Agent Orchestration
                 </Link>
                 <div className="flex gap-6">
                   <Link
@@ -55,7 +55,7 @@ export default function RootLayout({
           <footer className="bg-gray-100 border-t border-gray-200 py-6">
             <div className="container text-center text-gray-600 text-sm">
               <p>
-                Yuno AI Agent Orchestration Platform v0.1.0 | Build and deploy
+                Agent Orchestration Platform v0.1.0 | Build and deploy
                 multi-agent workflows
               </p>
             </div>

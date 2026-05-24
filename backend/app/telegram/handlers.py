@@ -141,7 +141,7 @@ async def _execute_and_respond(
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle /start command."""
     await update.message.reply_text(
-        "🤖 Welcome to Yuno AI Agent Orchestration!\n\n"
+        "🤖 Welcome to Agent Orchestration Platform!\n\n"
         "I can help you execute multi-agent workflows.\n\n"
         "Commands:\n"
         "/start - Show this message\n"

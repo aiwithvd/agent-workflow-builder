@@ -21,7 +21,7 @@ async def lifespan(app: FastAPI):
 
 # Create FastAPI app
 app = FastAPI(
-    title="Yuno AI Agent Orchestration Platform",
+    title="Agent Orchestration Platform",
     description="Build, configure, and orchestrate AI agents",
     version="0.1.0",
     lifespan=lifespan,
@@ -52,7 +52,7 @@ async def health() -> dict:
 async def root() -> dict:
     """Root endpoint."""
     return {
-        "name": "Yuno AI Agent Orchestration Platform",
+        "name": "Agent Orchestration Platform",
         "version": "0.1.0",
         "docs_url": "/docs",
     }

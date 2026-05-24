@@ -1,4 +1,4 @@
-# Yuno AI Agent Orchestration Platform
+# Agent Orchestration Platform
 
 A production-ready full-stack platform for creating, configuring, and orchestrating AI agents into collaborative workflows. Agents run on a real LangGraph runtime, execute real tools, and communicate asynchronously to complete complex tasks.
 
@@ -47,7 +47,7 @@ A production-ready full-stack platform for creating, configuring, and orchestrat
 
 ```bash
 # Clone and navigate to project
-cd yuno-ai-platform
+cd agent-orchestration-platform
 
 # Copy environment template and fill in credentials
 cp .env.example .env
@@ -201,7 +201,7 @@ Routes support requests to appropriate specialist agents.
     │ Supabase  │          │   Redis    │  │ Telegram  │
     │PostgreSQL │          │  (local)   │  │   Bot     │
     │           │          │            │  │           │
-    │agents     │          │ pub/sub    │  │@YunoAI    │
+    │agents     │          │ pub/sub    │  │@AgeOrcBot │
     │workflows  │          │ real-time  │  │           │
     │executions │          │ events     │  │ /start    │
     │messages   │          │            │  │ /status   │
