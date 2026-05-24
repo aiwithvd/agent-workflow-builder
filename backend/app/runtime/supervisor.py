@@ -2,7 +2,7 @@
 
 from typing import Any
 
-from langchain_core.language_model import BaseLLM
+from langchain_core.language_models import BaseLLM
 from langchain_core.messages import BaseMessage, HumanMessage
 from langgraph.graph import END, StateGraph
 from langgraph.prebuilt import create_react_agent

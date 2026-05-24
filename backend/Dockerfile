@@ -2,6 +2,9 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
+# Set PYTHONPATH so Alembic can find the app module
+ENV PYTHONPATH=/app:$PYTHONPATH
+
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     gcc \
