@@ -41,7 +41,7 @@ async def post_stop(app: Application):
     logger.info("Telegram bot stopped")
 
 
-async def main():
+def main():
     """Start the bot."""
     if not settings.telegram_bot_token:
         logger.error("TELEGRAM_BOT_TOKEN not set in environment")
@@ -66,8 +66,8 @@ async def main():
 
     # Start polling
     logger.info("🤖 Telegram bot starting...")
-    await application.run_polling()
+    application.run_polling()
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
