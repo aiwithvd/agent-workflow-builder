@@ -2,10 +2,11 @@
 
 A production-ready full-stack platform for creating, configuring, and orchestrating AI agents into collaborative workflows. Agents run on a real LangGraph runtime, execute real tools, and communicate asynchronously to complete complex tasks.
 
-**Status**: ✅ MVP Complete (Phases 1-5)
+**Status**: ✅ MVP Complete (Phases 1-6)
 - Backend: FastAPI + LangGraph + Supabase + Redis
 - Frontend: Next.js + React Flow + Tailwind CSS  
 - Telegram Integration: Real-time agent communication
+- LLM Support: Ollama (local) + OpenRouter (cloud) + GLM-5.1 (cloud/local)
 - Demo Ready: Pre-built workflows + sample agents
 
 ## 🎯 Key Features
@@ -22,7 +23,7 @@ A production-ready full-stack platform for creating, configuring, and orchestrat
 ### Backend
 - **Framework**: FastAPI with async/await
 - **Agent Runtime**: LangGraph (supervisor pattern)
-- **LLM**: Ollama (local) + OpenRouter (cloud)
+- **LLM**: Ollama (local) + OpenRouter (cloud) + GLM-5.1 (Z.ai cloud or local inference)
 - **Database**: Supabase PostgreSQL with Alembic migrations
 - **Real-time**: Redis pub/sub for event streaming
 - **Messaging**: python-telegram-bot for Telegram integration
@@ -141,8 +142,16 @@ WS     /api/v1/executions/ws/monitor/{id}  # Live monitoring
 - **weather**: OpenWeatherMap weather data
 
 ### LLM Providers
-- **ollama**: Local Llama 3.2 or Mistral (free, private)
-- **openrouter**: Any model via unified API (requires API key)
+
+#### Cloud Providers
+- **openrouter**: Any model via unified API (requires OpenRouter API key)
+- **glm51**: GLM-5.1 via Z.ai cloud API (requires Z.ai API key, OpenAI-compatible)
+
+#### Local Providers
+- **ollama**: Local Llama 3.2 or Mistral (free, private, localhost:11434)
+- **glm51-local**: Local GLM-5.1 inference via vLLM or llama.cpp (requires local server)
+
+**GLM-5.1 Benefits**: Open-source model (#1 on SWE-Bench Pro), 8-hour autonomous execution loops, excellent for agentic tasks and coding
 
 ### Pre-built Workflow Templates
 

@@ -22,6 +22,13 @@ class Settings(BaseSettings):
     ollama_url: str = "http://localhost:11434"
     openrouter_api_key: str = ""
 
+    # Z.ai / GLM-5.1 (Cloud API)
+    z_ai_api_key: str = ""
+    z_ai_base_url: str = "https://api.z.ai/v1"
+
+    # GLM-5.1 (Local Inference)
+    glm51_local_url: str = ""
+
     # Telegram
     telegram_bot_token: str = ""
 

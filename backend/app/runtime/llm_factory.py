@@ -39,5 +39,33 @@ def create_llm(provider: LLMProvider | str, model: str) -> BaseChatModel:
                 temperature=0.7,
             )
 
+        case LLMProvider.GLM51:
+            if not settings.z_ai_api_key:
+                raise ValueError(
+                    "Z.ai API key not set. Set Z_AI_API_KEY environment variable "
+                    "to use GLM-5.1 cloud API. Get it from https://z.ai"
+                )
+
+            return ChatOpenAI(
+                model=model,
+                base_url=settings.z_ai_base_url,
+                api_key=settings.z_ai_api_key,
+                temperature=0.7,
+            )
+
+        case LLMProvider.GLM51_LOCAL:
+            if not settings.glm51_local_url:
+                raise ValueError(
+                    "GLM-5.1 local endpoint URL not set. Set GLM51_LOCAL_URL environment variable "
+                    "to point to your vLLM or llama.cpp server (e.g., http://localhost:8000/v1)"
+                )
+
+            return ChatOpenAI(
+                model=model,
+                base_url=settings.glm51_local_url,
+                api_key="not-needed",  # Local inference doesn't require API key
+                temperature=0.7,
+            )
+
         case _:
             raise ValueError(f"Unsupported LLM provider: {provider}")
