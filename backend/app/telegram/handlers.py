@@ -11,9 +11,10 @@ from sqlalchemy import select
 
 from app.database import async_session
 from app.database.redis_client import set_session, get_session
-from app.models import Workflow, Execution, Agent
-from app.enums import MessageChannel, ExecutionStatus
+from app.models import Workflow, Execution, Agent, Message
+from app.enums import MessageChannel, ExecutionStatus, MessageType
 from app.runtime.executor import execution_service
+from app.services.channel_router import route_telegram
 
 logger = logging.getLogger(__name__)
 
@@ -35,15 +36,20 @@ async def handle_workflow_message(
     message_id = update.message.message_id
 
     try:
-        # Get or find workflow
+        # Resolve workflow: explicit ID → ChannelRouter telegram trigger → most recent
         async with async_session() as db:
             if workflow_id:
                 workflow = await db.get(Workflow, workflow_id)
             else:
-                # Use most recent workflow or first template
-                stmt = select(Workflow).order_by(Workflow.created_at.desc()).limit(1)
-                result = await db.execute(stmt)
-                workflow = result.scalar_one_or_none()
+                # Try ChannelRouter first (DB-backed trigger registry)
+                routed_id = await route_telegram(chat_id=chat_id)
+                if routed_id:
+                    workflow = await db.get(Workflow, routed_id)
+                else:
+                    # Fallback: use most recent workflow
+                    stmt = select(Workflow).order_by(Workflow.created_at.desc()).limit(1)
+                    result = await db.execute(stmt)
+                    workflow = result.scalar_one_or_none()
 
             if not workflow:
                 await update.message.reply_text(
@@ -60,6 +66,17 @@ async def handle_workflow_message(
                 input={"message": user_message, "chat_id": chat_id},
             )
             db.add(execution)
+
+            # Persist the incoming user message
+            user_msg = Message(
+                execution_id=execution_id,
+                from_agent="user",
+                to_agent="workflow",
+                message_type=MessageType.USER_INPUT,
+                channel=MessageChannel.TELEGRAM,
+                content=user_message,
+            )
+            db.add(user_msg)
             await db.commit()
 
         # Store session
@@ -106,29 +123,34 @@ async def _execute_and_respond(
         update: Telegram update
         processing_msg: Processing message to edit
     """
+    chat_id = str(update.message.chat_id)
     try:
-        # Execute workflow
+        # Each Telegram user gets a persistent thread so agents remember prior messages.
+        # thread_id "telegram-{chat_id}" maps to the same LangGraph checkpoint across runs.
         result = await execution_service.execute_workflow(
             execution_id,
             workflow_id,
-            {"message": user_message},
+            {"message": user_message, "chat_id": chat_id},
             channel=MessageChannel.TELEGRAM,
+            thread_id=f"telegram-{chat_id}",
         )
 
-        # Extract response from result
-        response_text = "✅ Execution completed!\n\n"
+        # Extract the final AI response cleanly
+        final_text = execution_service._extract_final_text(result) if isinstance(result, dict) else str(result)
+        response_text = f"✅ Done!\n\n{final_text[:3800]}" if final_text else "✅ Execution completed (no output)."
 
-        if isinstance(result, dict):
-            if "messages" in result and result["messages"]:
-                last_message = result["messages"][-1]
-                if isinstance(last_message, dict):
-                    response_text += last_message.get("content", str(result))
-                else:
-                    response_text += str(last_message)
-            else:
-                response_text += json.dumps(result, indent=2)[:1000]
-        else:
-            response_text += str(result)[:1000]
+        # Persist agent response message
+        async with async_session() as db:
+            agent_msg = Message(
+                execution_id=execution_id,
+                from_agent="workflow",
+                to_agent="user",
+                message_type=MessageType.AGENT_RESPONSE,
+                channel=MessageChannel.TELEGRAM,
+                content=response_text,
+            )
+            db.add(agent_msg)
+            await db.commit()
 
         # Edit processing message with result
         await processing_msg.edit_text(response_text)

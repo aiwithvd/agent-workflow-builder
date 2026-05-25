@@ -2,7 +2,9 @@ FROM node:20-alpine AS deps
 
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci
+# Use npm install (not npm ci) so new packages added to package.json
+# are resolved even before the lockfile is regenerated locally.
+RUN npm install
 
 FROM node:20-alpine AS runner
 

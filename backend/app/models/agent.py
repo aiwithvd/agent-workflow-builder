@@ -22,6 +22,7 @@ class Agent(Base):
     channels: Mapped[list] = mapped_column(JSON, default=list)  # [MessageChannel, ...]
     memory_enabled: Mapped[bool] = mapped_column(default=False)
     guardrails: Mapped[dict | None] = mapped_column(JSON)  # {max_tokens, rate_limit}
+    schedule: Mapped[str | None] = mapped_column(String(100))  # cron expression e.g. "0 9 * * *"
     created_at: Mapped[datetime] = mapped_column(
         TIMESTAMP(timezone=True), default=func.now(), index=True
     )

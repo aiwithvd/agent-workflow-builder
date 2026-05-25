@@ -11,7 +11,13 @@ services:
     volumes:
       - ./backend:/app
       - agent_files:/app/files
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    command: sh -c "python -m alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+    depends_on:
+      - langfuse
+    environment:
+      LANGFUSE_HOST: http://langfuse:3000
+      LANGFUSE_PUBLIC_KEY: lf-pk-placeholder
+      LANGFUSE_SECRET_KEY: lf-sk-placeholder
     networks:
       - agent-orchestration-network
 
@@ -33,19 +39,95 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
-      - "3000:3000"
+      - "4000:3000"
     env_file: .env
     environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:8000
-      - NEXT_PUBLIC_WS_URL=ws://localhost:8000
+      - NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
+      - NEXT_PUBLIC_WS_URL=ws://localhost:8000/api/v1
+      - NEXT_PUBLIC_LANGGRAPH_URL=http://localhost:8123
     depends_on:
       - backend
     networks:
       - agent-orchestration-network
 
+  langfuse-db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: langfuse
+      POSTGRES_PASSWORD: langfuse
+      POSTGRES_DB: langfuse
+    volumes:
+      - langfuse_db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U langfuse -d langfuse"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - agent-orchestration-network
+
+  langfuse:
+    image: langfuse/langfuse:2
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://langfuse:langfuse@langfuse-db:5432/langfuse
+      - NEXTAUTH_URL=http://localhost:3000
+      - NEXTAUTH_SECRET=${LANGFUSE_NEXTAUTH_SECRET:-changeme-langfuse-secret-32chars!!}
+      - SALT=${LANGFUSE_SALT:-changeme-langfuse-salt-value-here}
+      - TELEMETRY_ENABLED=false
+      - NEXT_PUBLIC_SIGN_UP_DISABLED=false
+      - LANGFUSE_ENABLE_EXPERIMENTAL_FEATURES=false
+    depends_on:
+      langfuse-db:
+        condition: service_healthy
+    networks:
+      - agent-orchestration-network
+
+  langgraph-redis:
+    image: redis:7-alpine
+    networks:
+      - agent-orchestration-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  langgraph-server:
+    # Uses the same image as the backend (all deps pre-installed).
+    # Runs `langgraph dev` which reads langgraph.json → dispatcher.py:make_graph.
+    # Exposes the LangGraph Server REST+SSE API on port 8123.
+    # No license key required — `langgraph dev` is the open-source dev server.
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8123:8123"
+    env_file: .env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./backend:/app
+    working_dir: /app
+    command: langgraph dev --host 0.0.0.0 --port 8123 --no-browser
+    depends_on:
+      langgraph-redis:
+        condition: service_healthy
+      backend:
+        condition: service_started
+    environment:
+      REDIS_URI: redis://langgraph-redis:6379
+      LANGCHAIN_TRACING_V2: "false"
+    networks:
+      - agent-orchestration-network
+
 volumes:
   agent_files:
+  langfuse_db:
 
 networks:
   agent-orchestration-network:
     driver: bridge
+    enable_ipv6: true

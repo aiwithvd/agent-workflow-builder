@@ -1,83 +1,120 @@
-"""Tests for agent creation, retrieval, and management."""
+"""Functional tests for the Agents API."""
 
-import os
 import pytest
 
 
-@pytest.fixture(scope="session", autouse=True)
-def setup_test_env():
-    """Set up test environment variables before any imports."""
-    os.environ.setdefault("DATABASE_URL", "postgresql+asyncpg://user:pass@localhost/test_db")
-    os.environ.setdefault("SUPABASE_URL", "https://test.supabase.co")
-    os.environ.setdefault("SUPABASE_KEY", "test-key")
-    os.environ.setdefault("REDIS_URL", "redis://localhost:6379")
-    os.environ.setdefault("OLLAMA_URL", "http://localhost:11434")
-    os.environ.setdefault("OPENROUTER_API_KEY", "test-key")
-    os.environ.setdefault("TELEGRAM_BOT_TOKEN", "test-token")
-    os.environ.setdefault("OPENWEATHERMAP_API_KEY", "test-key")
+# ── Structural tests (no DB needed) ───────────────────────────────────────────
 
-
-def test_agent_model_structure():
-    """Test that Agent model structure is correct."""
+def test_agent_model_has_required_columns():
     from app.models.agent import Agent
     from sqlalchemy import inspect
-
-    mapper = inspect(Agent)
-    columns = {col.name for col in mapper.columns}
-
-    required_columns = {"id", "name", "role", "system_prompt", "model", "tools", "channels", "created_at"}
-    assert required_columns.issubset(columns), f"Missing columns: {required_columns - columns}"
+    cols = {c.name for c in inspect(Agent).columns}
+    assert {"id", "name", "role", "system_prompt", "model", "tools",
+            "channels", "memory_enabled", "guardrails", "schedule", "created_at"} <= cols
 
 
-def test_agent_enums_defined():
-    """Test that required enums are defined."""
-    from app.enums import LLMProvider, AgentTool, MessageChannel, MessageType, ExecutionStatus
-
-    # Test LLMProvider
-    assert hasattr(LLMProvider, "OLLAMA")
-    assert hasattr(LLMProvider, "OPENROUTER")
-
-    # Test AgentTool
-    assert hasattr(AgentTool, "WEB_SEARCH")
-    assert hasattr(AgentTool, "CALCULATOR")
-    assert hasattr(AgentTool, "FILE_READ")
-    assert hasattr(AgentTool, "FILE_WRITE")
-    assert hasattr(AgentTool, "WEATHER")
-
-    # Test MessageChannel
-    assert hasattr(MessageChannel, "WEB")
-    assert hasattr(MessageChannel, "TELEGRAM")
+def test_all_enums_defined():
+    from app.enums import LLMProvider, AgentTool, MessageChannel, ExecutionStatus
+    assert LLMProvider.OLLAMA == "ollama"
+    assert LLMProvider.GLM51 == "glm51"
+    assert AgentTool.CODE_EXECUTOR == "code_executor"
+    assert AgentTool.HTTP_REQUEST == "http_request"
+    assert MessageChannel.TELEGRAM == "telegram"
+    assert ExecutionStatus.FAILED == "failed"
 
 
-def test_tools_registry():
-    """Test that tool registry is properly configured."""
+def test_all_tools_registered():
     from app.runtime.tools.registry import TOOL_FACTORY_REGISTRY
     from app.enums import AgentTool
-
-    # Check that all tools are registered
     for tool in AgentTool:
-        assert tool in TOOL_FACTORY_REGISTRY, f"Tool {tool} not registered"
+        assert tool in TOOL_FACTORY_REGISTRY, f"Tool {tool.value!r} missing from registry"
 
 
-def test_llm_factory_implementation():
-    """Test that LLM factory can be imported and has required functions."""
-    from app.runtime.llm_factory import create_llm
-    from app.enums import LLMProvider
+# ── API tests ──────────────────────────────────────────────────────────────────
 
-    # Verify factory function exists and is callable
-    assert callable(create_llm)
+@pytest.mark.asyncio
+async def test_create_agent(client, agent_payload):
+    resp = await client.post("/api/v1/agents", json=agent_payload)
+    assert resp.status_code == 201
+    data = resp.json()
+    assert data["name"] == agent_payload["name"]
+    assert data["provider"] == "ollama"
+    assert "id" in data
 
 
-def test_database_models_importable():
-    """Test that all database models can be imported."""
-    from app.models.agent import Agent
-    from app.models.workflow import Workflow
-    from app.models.execution import Execution
-    from app.models.message import Message
-    from app.database import Base
+@pytest.mark.asyncio
+async def test_list_agents(client, agent_payload):
+    await client.post("/api/v1/agents", json=agent_payload)
+    resp = await client.get("/api/v1/agents")
+    assert resp.status_code == 200
+    assert isinstance(resp.json(), list)
+    assert len(resp.json()) >= 1
 
-    # Verify all models are subclasses of Base
-    assert issubclass(Agent, Base)
-    assert issubclass(Workflow, Base)
-    assert issubclass(Execution, Base)
-    assert issubclass(Message, Base)
+
+@pytest.mark.asyncio
+async def test_get_agent(client, agent_payload):
+    create_resp = await client.post("/api/v1/agents", json=agent_payload)
+    agent_id = create_resp.json()["id"]
+
+    resp = await client.get(f"/api/v1/agents/{agent_id}")
+    assert resp.status_code == 200
+    assert resp.json()["id"] == agent_id
+
+
+@pytest.mark.asyncio
+async def test_get_agent_not_found(client):
+    resp = await client.get("/api/v1/agents/00000000-0000-0000-0000-000000000000")
+    assert resp.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_update_agent(client, agent_payload):
+    create_resp = await client.post("/api/v1/agents", json=agent_payload)
+    agent_id = create_resp.json()["id"]
+
+    resp = await client.patch(f"/api/v1/agents/{agent_id}", json={"name": "Updated Name"})
+    assert resp.status_code == 200
+    assert resp.json()["name"] == "Updated Name"
+
+
+@pytest.mark.asyncio
+async def test_update_agent_memory_and_guardrails(client, agent_payload):
+    create_resp = await client.post("/api/v1/agents", json=agent_payload)
+    agent_id = create_resp.json()["id"]
+
+    resp = await client.patch(f"/api/v1/agents/{agent_id}", json={
+        "memory_enabled": True,
+        "guardrails": {"max_tokens": 2000, "rate_limit": 10},
+        "schedule": "0 9 * * *",
+    })
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["memory_enabled"] is True
+    assert data["guardrails"]["max_tokens"] == 2000
+    assert data["schedule"] == "0 9 * * *"
+
+
+@pytest.mark.asyncio
+async def test_delete_agent(client, agent_payload):
+    create_resp = await client.post("/api/v1/agents", json=agent_payload)
+    agent_id = create_resp.json()["id"]
+
+    resp = await client.delete(f"/api/v1/agents/{agent_id}")
+    assert resp.status_code == 204
+
+    # Verify it's gone
+    get_resp = await client.get(f"/api/v1/agents/{agent_id}")
+    assert get_resp.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_create_agent_missing_name(client):
+    resp = await client.post("/api/v1/agents", json={"model": "llama3", "provider": "ollama"})
+    assert resp.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_create_agent_invalid_provider(client, agent_payload):
+    payload = {**agent_payload, "provider": "nonexistent_provider"}
+    resp = await client.post("/api/v1/agents", json=payload)
+    assert resp.status_code == 422

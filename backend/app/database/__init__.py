@@ -3,14 +3,22 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 
 from app.config import settings
 
-# Create async engine
-engine = create_async_engine(
-    settings.database_url,
-    echo=settings.debug,
-    future=True,
-    pool_pre_ping=True,
-    connect_args={"ssl": "require"},
-)
+_url = settings.database_url
+_is_sqlite = _url.startswith("sqlite")
+
+# Postgres (Supabase) needs pool tuning and SSL; SQLite needs neither.
+_engine_kwargs: dict = {"echo": settings.debug, "future": True}
+if not _is_sqlite:
+    _engine_kwargs.update({
+        "pool_pre_ping": True,
+        "pool_size": 5,
+        "max_overflow": 10,
+        "pool_timeout": 30,
+        "pool_recycle": 1800,
+        "connect_args": {"ssl": "require"},
+    })
+
+engine = create_async_engine(_url, **_engine_kwargs)
 
 # Session maker
 async_session = sessionmaker(

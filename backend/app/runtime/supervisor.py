@@ -44,7 +44,7 @@ Always explain your reasoning for routing tasks to specific agents."""
     return create_react_agent(
         llm,
         tools=tool_list,
-        system_prompt=system_prompt,
+        prompt=system_prompt,
     )
 
 
@@ -80,5 +80,5 @@ If asked about something outside your domain, be honest about the limitation."""
     return create_react_agent(
         llm,
         tools=tool_list,
-        system_prompt=enhanced_prompt,
+        prompt=enhanced_prompt,
     )

@@ -16,12 +16,15 @@ class AgentTool(StrEnum):
     FILE_READ = "file_read"
     FILE_WRITE = "file_write"
     WEATHER = "weather"
+    CODE_EXECUTOR = "code_executor"
+    HTTP_REQUEST = "http_request"
 
 
 class MessageChannel(StrEnum):
     """Communication channels for agents."""
     WEB = "web"
     TELEGRAM = "telegram"
+    API = "api"
 
 
 class MessageType(StrEnum):

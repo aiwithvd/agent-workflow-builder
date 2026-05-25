@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.models import Agent
 from app.schemas.agent import AgentCreate, AgentRead, AgentUpdate
+from app.scheduler import agent_scheduler
 
 router = APIRouter(prefix="/api/v1/agents", tags=["agents"])
 
@@ -35,6 +36,7 @@ async def create_agent(agent: AgentCreate, db: AsyncSession = Depends(get_db)):
     db.add(db_agent)
     await db.commit()
     await db.refresh(db_agent)
+    agent_scheduler.register(str(db_agent.id), db_agent.schedule)
     return db_agent
 
 
@@ -53,6 +55,7 @@ async def update_agent(
 
     await db.commit()
     await db.refresh(db_agent)
+    agent_scheduler.register(str(db_agent.id), db_agent.schedule)
     return db_agent
 
 
@@ -63,5 +66,6 @@ async def delete_agent(agent_id: UUID, db: AsyncSession = Depends(get_db)):
     if not db_agent:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Agent not found")
 
+    agent_scheduler.unregister(str(agent_id))
     await db.delete(db_agent)
     await db.commit()

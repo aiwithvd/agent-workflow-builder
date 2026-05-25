@@ -1,131 +1,146 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { executionsAPI } from "@/lib/api";
+import { useState } from "react";
+import { useExecutions } from "@/lib/hooks/useExecutions";
+import { Card, CardBody } from "@/components/ui/Card";
+import { Badge, statusToBadgeVariant } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
+import { Spinner } from "@/components/ui/Spinner";
+import { EmptyState } from "@/components/ui/EmptyState";
 
-interface Execution {
-  id: string;
-  workflow_id: string;
-  status: string;
-  total_tokens: number;
-  started_at: string;
-  completed_at?: string;
-}
+const STATUS_FILTERS = ["all", "running", "completed", "failed", "pending"];
 
 export default function ExecutionsPage() {
-  const [executions, setExecutions] = useState<Execution[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { executions, isLoading, error } = useExecutions();
+  const [filter, setFilter] = useState("all");
 
-  useEffect(() => {
-    async function loadExecutions() {
-      try {
-        const res = await executionsAPI.list();
-        if (res.data) {
-          setExecutions(res.data);
-        } else {
-          setError(res.error || "Failed to load executions");
-        }
-      } catch (err) {
-        setError("Error loading executions");
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadExecutions();
-    // Refresh every 5 seconds
-    const interval = setInterval(loadExecutions, 5000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "completed":
-        return "bg-green-100 text-green-800";
-      case "running":
-        return "bg-blue-100 text-blue-800";
-      case "failed":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
+  const filtered =
+    filter === "all"
+      ? executions
+      : executions.filter((e: any) => e.status === filter);
 
   return (
-    <div className="max-w-6xl">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Executions</h1>
-        <p className="text-gray-600">Monitor workflow executions in real-time</p>
+    <div className="max-w-5xl space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+            Executions
+          </h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+            Real-time workflow execution monitor
+          </p>
+        </div>
       </div>
 
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
-          {error}
-        </div>
-      )}
+      {/* Filters */}
+      <div className="flex gap-2 flex-wrap">
+        {STATUS_FILTERS.map((s) => (
+          <button
+            key={s}
+            onClick={() => setFilter(s)}
+            className={`px-3 py-1 rounded-full text-xs font-medium transition-colors capitalize ${
+              filter === s
+                ? "bg-indigo-600 text-white"
+                : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
+            }`}
+          >
+            {s}
+          </button>
+        ))}
+      </div>
 
-      {loading ? (
-        <div className="text-center py-12">Loading executions...</div>
-      ) : executions.length === 0 ? (
-        <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
-          <p className="text-gray-600">No executions yet</p>
+      {isLoading ? (
+        <div className="flex justify-center py-20">
+          <Spinner size="lg" />
         </div>
+      ) : error ? (
+        <EmptyState icon="⚠️" title="Failed to load executions" description={(error as Error).message} />
+      ) : filtered.length === 0 ? (
+        <EmptyState
+          icon="📊"
+          title="No executions"
+          description={
+            filter === "all"
+              ? "Run a workflow to see execution history here."
+              : `No ${filter} executions.`
+          }
+        />
       ) : (
-        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th className="px-6 py-3 text-left text-sm font-semibold">
-                  Execution ID
-                </th>
-                <th className="px-6 py-3 text-left text-sm font-semibold">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left text-sm font-semibold">
-                  Tokens
-                </th>
-                <th className="px-6 py-3 text-left text-sm font-semibold">
-                  Started
-                </th>
-                <th className="px-6 py-3 text-left text-sm font-semibold">
-                  Action
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {executions.map((exec) => (
-                <tr key={exec.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-3 text-sm font-mono">
-                    {exec.id.substring(0, 8)}...
-                  </td>
-                  <td className="px-6 py-3">
-                    <span
-                      className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                        exec.status
-                      )}`}
-                    >
-                      {exec.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-3 text-sm">{exec.total_tokens}</td>
-                  <td className="px-6 py-3 text-sm">
-                    {new Date(exec.started_at).toLocaleString()}
-                  </td>
-                  <td className="px-6 py-3">
-                    <Link
-                      href={`/executions/${exec.id}`}
-                      className="text-primary hover:underline text-sm font-medium"
-                    >
-                      View
-                    </Link>
-                  </td>
+        <Card>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-slate-100 dark:border-slate-800 text-left">
+                  <th className="px-6 py-3 text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+                    ID
+                  </th>
+                  <th className="px-6 py-3 text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+                    Workflow
+                  </th>
+                  <th className="px-6 py-3 text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+                    Started
+                  </th>
+                  <th className="px-6 py-3 text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+                    Duration
+                  </th>
+                  <th className="px-6 py-3"></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                {filtered.map((ex: any) => {
+                  const start = ex.created_at ? new Date(ex.created_at) : null;
+                  const end = ex.updated_at ? new Date(ex.updated_at) : null;
+                  const duration =
+                    start && end && ex.status !== "running"
+                      ? `${Math.round((end.getTime() - start.getTime()) / 1000)}s`
+                      : null;
+
+                  return (
+                    <tr
+                      key={ex.id}
+                      className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
+                    >
+                      <td className="px-6 py-3">
+                        <span className="font-mono text-xs text-slate-500 dark:text-slate-400">
+                          {ex.id.slice(0, 8)}…
+                        </span>
+                      </td>
+                      <td className="px-6 py-3 text-slate-700 dark:text-slate-300">
+                        {ex.workflow_name ?? ex.workflow_id?.slice(0, 8)}
+                      </td>
+                      <td className="px-6 py-3">
+                        <Badge
+                          variant={statusToBadgeVariant(ex.status)}
+                          pulse={ex.status === "running"}
+                        >
+                          {ex.status}
+                        </Badge>
+                      </td>
+                      <td className="px-6 py-3 text-slate-500 dark:text-slate-400">
+                        {start ? start.toLocaleString() : "—"}
+                      </td>
+                      <td className="px-6 py-3 text-slate-500 dark:text-slate-400">
+                        {duration ?? (ex.status === "running" ? "…" : "—")}
+                      </td>
+                      <td className="px-6 py-3">
+                        <Link
+                          href={`/executions/${ex.id}`}
+                          className="text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:underline"
+                        >
+                          View
+                        </Link>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </Card>
       )}
     </div>
   );

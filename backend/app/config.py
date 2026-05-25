@@ -35,6 +35,11 @@ class Settings(BaseSettings):
     # Tools
     openweathermap_api_key: str = ""
 
+    # Langfuse (LLM observability)
+    langfuse_host: str = "http://langfuse:3000"
+    langfuse_public_key: str = "lf-pub-local"
+    langfuse_secret_key: str = "lf-sec-local"
+
     # App
     debug: bool = False
     environment: str = "development"

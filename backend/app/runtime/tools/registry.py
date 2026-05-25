@@ -6,7 +6,9 @@ from langchain_core.tools import Tool
 
 from app.enums import AgentTool
 from app.runtime.tools.calculator import create_calculator_tool
+from app.runtime.tools.code_executor import create_code_executor_tool
 from app.runtime.tools.file_ops import create_file_read_tool, create_file_write_tool
+from app.runtime.tools.http_request import create_http_request_tool
 from app.runtime.tools.web_search import create_web_search_tool
 from app.runtime.tools.weather import create_weather_tool
 
@@ -14,8 +16,10 @@ from app.runtime.tools.weather import create_weather_tool
 TOOL_FACTORY_REGISTRY: dict[AgentTool, Callable[[], Tool]] = {
     AgentTool.WEB_SEARCH: create_web_search_tool,
     AgentTool.CALCULATOR: create_calculator_tool,
+    AgentTool.CODE_EXECUTOR: create_code_executor_tool,
     AgentTool.FILE_READ: create_file_read_tool,
     AgentTool.FILE_WRITE: create_file_write_tool,
+    AgentTool.HTTP_REQUEST: create_http_request_tool,
     AgentTool.WEATHER: create_weather_tool,
 }
 

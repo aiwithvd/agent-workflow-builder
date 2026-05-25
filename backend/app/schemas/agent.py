@@ -23,6 +23,7 @@ class AgentCreate(BaseModel):
     channels: list[MessageChannel] = []
     memory_enabled: bool = False
     guardrails: GuardrailConfig | None = None
+    schedule: str | None = None
 
 
 class AgentUpdate(BaseModel):
@@ -36,6 +37,7 @@ class AgentUpdate(BaseModel):
     channels: list[MessageChannel] | None = None
     memory_enabled: bool | None = None
     guardrails: GuardrailConfig | None = None
+    schedule: str | None = None
 
 
 class AgentRead(BaseModel):
@@ -50,6 +52,7 @@ class AgentRead(BaseModel):
     channels: list[MessageChannel]
     memory_enabled: bool
     guardrails: GuardrailConfig | None
+    schedule: str | None
     created_at: datetime
     updated_at: datetime
 

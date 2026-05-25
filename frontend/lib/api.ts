@@ -26,11 +26,29 @@ async function apiCall<T>(
       headers,
     });
 
-    const data = await response.json();
+    // Handle 204 No Content (no response body)
+    let data;
+    if (response.status === 204) {
+      data = null;
+    } else {
+      data = await response.json();
+    }
 
     if (!response.ok) {
+      // Extract error message, handling both string and array formats
+      let errorMsg = "API error";
+      if (typeof data?.detail === "string") {
+        errorMsg = data.detail;
+      } else if (Array.isArray(data?.detail)) {
+        // Pydantic validation errors come as arrays
+        errorMsg = data.detail
+          .map((err: any) => `${err.loc?.join(".") || "field"}: ${err.msg}`)
+          .join("; ");
+      } else if (data?.detail) {
+        errorMsg = JSON.stringify(data.detail);
+      }
       return {
-        error: data.detail || "API error",
+        error: errorMsg,
         status: response.status,
       };
     }
@@ -87,6 +105,19 @@ export const executionsAPI = {
   get: (id: string) => apiCall(`/executions/${id}`),
   create: (data: any) =>
     apiCall("/executions", { method: "POST", body: JSON.stringify(data) }),
+  messages: (id: string) => apiCall(`/executions/${id}/messages`),
+  traces: (id: string) => apiCall(`/executions/${id}/traces`),
+  metrics: (id: string) => apiCall(`/executions/${id}/metrics`),
+};
+
+// Settings API
+export const settingsAPI = {
+  list: () => apiCall<any[]>("/settings"),
+  update: (settings: Array<{ key: string; value: string }>) =>
+    apiCall<any[]>("/settings", {
+      method: "PATCH",
+      body: JSON.stringify({ settings }),
+    }),
 };
 
 // WebSocket for monitoring

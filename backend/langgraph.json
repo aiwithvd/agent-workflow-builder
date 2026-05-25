@@ -1,0 +1,8 @@
+{
+  "graphs": {
+    "dynamic_workflow": "./app/runtime/dispatcher.py:make_graph"
+  },
+  "dependencies": ["."],
+  "env": ".env",
+  "python_version": "3.12"
+}

@@ -1,136 +1,125 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useWorkflows } from "@/lib/hooks/useWorkflows";
+import { Card, CardBody } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
+import { Spinner } from "@/components/ui/Spinner";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 import { workflowsAPI } from "@/lib/api";
 
-interface Workflow {
-  id: string;
-  name: string;
-  description?: string;
-  template_name?: string;
-  created_at: string;
-}
-
 export default function WorkflowsPage() {
-  const [workflows, setWorkflows] = useState<Workflow[]>([]);
+  const { workflows, isLoading, error } = useWorkflows();
   const [templates, setTemplates] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
-    async function loadData() {
-      try {
-        const [workflowsRes, templatesRes] = await Promise.all([
-          workflowsAPI.list(),
-          workflowsAPI.templates(),
-        ]);
-
-        if (workflowsRes.data) {
-          setWorkflows(workflowsRes.data);
-        }
-
-        if (templatesRes.data && templatesRes.data.templates) {
-          setTemplates(templatesRes.data.templates);
-        }
-      } catch (err) {
-        setError("Failed to load workflows");
-      } finally {
-        setLoading(false);
+    workflowsAPI.templates().then((res) => {
+      if (res.data && (res.data as any).templates) {
+        setTemplates((res.data as any).templates);
       }
-    }
-
-    loadData();
+    });
   }, []);
 
   return (
-    <div className="max-w-6xl">
-      <div className="flex items-center justify-between mb-8">
+    <div className="max-w-5xl space-y-8">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold mb-2">Workflows</h1>
-          <p className="text-gray-600">Create multi-agent workflows</p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+            Workflows
+          </h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+            {workflows.length} workflow{workflows.length !== 1 ? "s" : ""}
+          </p>
         </div>
-        <Link
-          href="/workflows/new"
-          className="px-4 py-2 bg-secondary text-white rounded-lg hover:bg-purple-600"
-        >
-          + New Workflow
+        <Link href="/workflows/new">
+          <Button>New Workflow</Button>
         </Link>
       </div>
 
-      {/* Templates Section */}
-      {!loading && templates.length > 0 && (
-        <div className="mb-12">
-          <h2 className="text-2xl font-bold mb-4">Templates</h2>
-          <div className="grid grid-cols-2 gap-4">
-            {templates.map((template) => (
+      {/* Templates */}
+      {templates.length > 0 && (
+        <div className="space-y-3">
+          <h2 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+            Templates
+          </h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {templates.map((t: any) => (
               <Link
-                key={template.name}
-                href={`/workflows/new?template=${template.name}`}
-                className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg border border-purple-200 p-6 hover:shadow-lg transition"
+                key={t.name}
+                href={`/workflows/new?template=${t.name}`}
+                className="p-4 rounded-xl border border-dashed border-indigo-300 dark:border-indigo-700 bg-indigo-50/50 dark:bg-indigo-900/10 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors"
               >
-                <h3 className="text-lg font-semibold text-purple-900">
-                  {template.name}
-                </h3>
-                <p className="text-purple-700 text-sm">
-                  {template.description}
+                <p className="font-medium text-indigo-700 dark:text-indigo-400 text-sm">
+                  {t.display_name || t.name}
                 </p>
+                {t.description && (
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
+                    {t.description}
+                  </p>
+                )}
               </Link>
             ))}
           </div>
         </div>
       )}
 
-      {/* Workflows List */}
-      <div>
-        <h2 className="text-2xl font-bold mb-4">Your Workflows</h2>
+      {/* Workflows */}
+      <div className="space-y-3">
+        <h2 className="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+          Your Workflows
+        </h2>
 
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
-            {error}
+        {isLoading ? (
+          <div className="flex justify-center py-20">
+            <Spinner size="lg" />
           </div>
-        )}
-
-        {loading ? (
-          <div className="text-center py-12">Loading workflows...</div>
+        ) : error ? (
+          <EmptyState
+            icon="⚠️"
+            title="Failed to load workflows"
+            description={(error as Error).message}
+          />
         ) : workflows.length === 0 ? (
-          <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
-            <p className="text-gray-600 mb-4">No workflows yet</p>
-            <Link
-              href="/workflows/new"
-              className="text-secondary hover:underline font-medium"
-            >
-              Create your first workflow →
-            </Link>
-          </div>
+          <EmptyState
+            icon="🔀"
+            title="No workflows yet"
+            description="Design multi-agent workflows on an interactive canvas."
+            action={{
+              label: "Create Workflow",
+              onClick: () => router.push("/workflows/new"),
+            }}
+          />
         ) : (
-          <div className="grid grid-cols-1 gap-4">
-            {workflows.map((workflow) => (
-              <Link
-                key={workflow.id}
-                href={`/workflows/${workflow.id}`}
-                className="bg-white rounded-lg border border-gray-200 p-6 hover:border-purple-300 hover:shadow-md transition"
-              >
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h3 className="text-lg font-semibold">{workflow.name}</h3>
-                    {workflow.description && (
-                      <p className="text-gray-600 text-sm mt-1">
-                        {workflow.description}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {workflows.map((wf: any) => (
+              <Link key={wf.id} href={`/workflows/${wf.id}`}>
+                <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
+                  <CardBody className="flex flex-col gap-2">
+                    <div className="flex items-start justify-between">
+                      <h3 className="font-semibold text-slate-900 dark:text-slate-100">
+                        {wf.name}
+                      </h3>
+                      {wf.template_name && (
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400">
+                          {wf.template_name}
+                        </span>
+                      )}
+                    </div>
+                    {wf.description && (
+                      <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2">
+                        {wf.description}
                       </p>
                     )}
-                    {workflow.template_name && (
-                      <span className="inline-block mt-2 px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded">
-                        Template: {workflow.template_name}
-                      </span>
-                    )}
-                  </div>
-                  <div className="text-right">
-                    <div className="text-xs text-gray-500">
-                      {new Date(workflow.created_at).toLocaleDateString()}
-                    </div>
-                  </div>
-                </div>
+                    <p className="text-xs text-slate-400 dark:text-slate-500 mt-auto">
+                      {wf.created_at
+                        ? new Date(wf.created_at).toLocaleDateString()
+                        : "—"}
+                    </p>
+                  </CardBody>
+                </Card>
               </Link>
             ))}
           </div>
