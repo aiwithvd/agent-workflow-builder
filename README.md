@@ -219,7 +219,7 @@ The Traces tab in the execution monitor fetches these traces from Langfuse's API
 Explicit comparison with the most common alternatives:
 
 | Capability | **This Platform** | **openclaw.ai** | CrewAI | AutoGen | n8n Agents |
-|---|---|---|---|---|---|---|
+|---|---|---|---|---|---|
 | **Visual workflow builder** | ✅ React Flow canvas, drag-drop | ❌ Control UI is chat/skill management | ❌ Code only | ❌ Code only | ✅ (limited) |
 | **Conditional routing** | ✅ Labeled edges → LangGraph conditional edges | ❌ No graph execution model | ⚠️ Role-based, no graph | ❌ Conversation-only | ⚠️ IF-node workaround |
 | **Per-step streaming** | ✅ WebSocket + node animation | ❌ Single-agent, no per-node streaming | ❌ | ❌ | ⚠️ Polling |
