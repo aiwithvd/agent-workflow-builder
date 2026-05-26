@@ -1,4 +1,4 @@
-# Agent Orchestration Platform
+# Agent Workflow Builder (Orchestration platform)
 
 A production-ready full-stack platform for creating, configuring, and orchestrating AI agents into collaborative multi-agent workflows. Agents execute on a real **LangGraph** runtime, communicate via tool calls and messages, and are monitored in real-time with **Langfuse-backed observability** — all running locally with a single `docker compose up`.
 
