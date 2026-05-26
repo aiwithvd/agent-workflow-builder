@@ -21,7 +21,7 @@ langchain-openai>=0.1.0
 # Checkpointing
 langgraph-checkpoint-postgres>=3.0.0
 psycopg[binary]>=3.2.0
-langgraph-cli>=0.1.0
+langgraph-cli[inmem]>=0.1.0
 
 # Telegram
 python-telegram-bot>=20.0
@@ -43,7 +43,7 @@ httpx>=0.25.0
 aiosqlite>=0.19.0
 
 # Observability
-langfuse>=2.0.0,<3.0.0
+langfuse>=3.0.0
 
 # Scheduling
 apscheduler>=3.10.0

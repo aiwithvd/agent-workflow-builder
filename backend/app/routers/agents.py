@@ -1,3 +1,5 @@
+import json
+from pathlib import Path
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -10,6 +12,38 @@ from app.schemas.agent import AgentCreate, AgentRead, AgentUpdate
 from app.scheduler import agent_scheduler
 
 router = APIRouter(prefix="/api/v1/agents", tags=["agents"])
+
+# Directory containing pre-configured agent preset JSON files
+_PRESETS_DIR = Path(__file__).parent.parent.parent / "agent_presets"
+_PRESET_ORDER = [
+    # Research Report template
+    "researcher",
+    "writer",
+    # Customer Support Triage template
+    "classifier",
+    "technical_support",
+    "billing_support",
+    "general_support",
+    # Standalone presets
+    "support_specialist",
+    "data_analyst",
+]
+
+
+@router.get("/presets")
+async def list_agent_presets() -> list[dict]:
+    """Return all pre-configured agent presets (read-only templates)."""
+    presets: list[dict] = []
+    for slug in _PRESET_ORDER:
+        path = _PRESETS_DIR / f"{slug}.json"
+        if path.exists():
+            presets.append(json.loads(path.read_text()))
+    # Fallback: any extra files not in the order list
+    for path in sorted(_PRESETS_DIR.glob("*.json")):
+        slug = path.stem
+        if slug not in _PRESET_ORDER:
+            presets.append(json.loads(path.read_text()))
+    return presets
 
 
 @router.get("", response_model=list[AgentRead])

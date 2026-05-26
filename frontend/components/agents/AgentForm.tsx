@@ -53,11 +53,18 @@ export function AgentForm({
       rate_limit: (initial.guardrails as any)?.rate_limit ?? "",
     },
     schedule: initial.schedule ?? "",
+    // LLM generation parameters
+    temperature: (initial as any).temperature ?? "",
+    top_p: (initial as any).top_p ?? "",
+    presence_penalty: (initial as any).presence_penalty ?? "",
+    frequency_penalty: (initial as any).frequency_penalty ?? "",
+    max_iterations: (initial as any).max_iterations ?? "",
   });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [showAdvanced, setShowAdvanced] = useState(
-    !!(initial.memory_enabled || initial.guardrails || initial.schedule)
+    !!(initial.memory_enabled || initial.guardrails || initial.schedule
+      || (initial as any).temperature || (initial as any).max_iterations)
   );
 
   function set(key: string, value: any) {
@@ -100,6 +107,11 @@ export function AgentForm({
         ...form,
         guardrails,
         schedule: form.schedule.trim() || null,
+        temperature: form.temperature !== "" ? Number(form.temperature) : null,
+        top_p: form.top_p !== "" ? Number(form.top_p) : null,
+        presence_penalty: form.presence_penalty !== "" ? Number(form.presence_penalty) : null,
+        frequency_penalty: form.frequency_penalty !== "" ? Number(form.frequency_penalty) : null,
+        max_iterations: form.max_iterations !== "" ? Number(form.max_iterations) : null,
       } as any);
     } finally {
       setLoading(false);
@@ -277,6 +289,56 @@ export function AgentForm({
               <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
                 Leave blank to disable scheduled runs. Format: minute hour day month weekday
               </p>
+            </div>
+
+            {/* LLM Generation Parameters */}
+            <div>
+              <p className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                LLM Parameters
+                <span className="ml-2 text-xs font-normal text-slate-400">— leave blank to use provider defaults</span>
+              </p>
+              <div className="grid grid-cols-2 gap-3">
+                <Input
+                  label="Temperature (0–2)"
+                  type="number"
+                  value={form.temperature}
+                  onChange={(e) => set("temperature", e.target.value)}
+                  placeholder="e.g. 0.7"
+                />
+                <Input
+                  label="Top P (0–1)"
+                  type="number"
+                  value={form.top_p}
+                  onChange={(e) => set("top_p", e.target.value)}
+                  placeholder="e.g. 0.9"
+                />
+                <Input
+                  label="Presence Penalty (−2–2)"
+                  type="number"
+                  value={form.presence_penalty}
+                  onChange={(e) => set("presence_penalty", e.target.value)}
+                  placeholder="e.g. 0.3"
+                />
+                <Input
+                  label="Frequency Penalty (−2–2)"
+                  type="number"
+                  value={form.frequency_penalty}
+                  onChange={(e) => set("frequency_penalty", e.target.value)}
+                  placeholder="e.g. 0.3"
+                />
+              </div>
+              <div className="mt-3">
+                <Input
+                  label="Max Iterations (1–50)"
+                  type="number"
+                  value={form.max_iterations}
+                  onChange={(e) => set("max_iterations", e.target.value)}
+                  placeholder="e.g. 10 (ReAct loop cap)"
+                />
+                <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
+                  Limits how many reasoning steps the agent takes before stopping.
+                </p>
+              </div>
             </div>
           </div>
         )}

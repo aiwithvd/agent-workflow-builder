@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useAgents } from "@/lib/hooks/useAgents";
 import { AgentCard } from "@/components/agents/AgentCard";
+import { AgentPresetPicker } from "@/components/agents/AgentPresetPicker";
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -28,6 +29,9 @@ export default function AgentsPage() {
         </Link>
       </div>
 
+      {/* Pre-configured agent presets */}
+      <AgentPresetPicker />
+
       {isLoading ? (
         <div className="flex justify-center py-20">
           <Spinner size="lg" />
@@ -43,17 +47,22 @@ export default function AgentsPage() {
         <EmptyState
           icon="🤖"
           title="No agents yet"
-          description="Create your first AI agent to get started with workflow orchestration."
+          description="Create your first AI agent to get started, or pick a preset above."
           action={{
             label: "Create Agent",
             onClick: () => router.push("/agents/new"),
           }}
         />
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {agents.map((agent: any) => (
-            <AgentCard key={agent.id} agent={agent} />
-          ))}
+        <div>
+          <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wide mb-3">
+            Your Agents
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {agents.map((agent: any) => (
+              <AgentCard key={agent.id} agent={agent} />
+            ))}
+          </div>
         </div>
       )}
     </div>

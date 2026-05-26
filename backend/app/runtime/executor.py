@@ -15,23 +15,60 @@ from app.runtime.graph_builder import build_graph_from_definition
 logger = logging.getLogger(__name__)
 
 
-def _get_langfuse_handler(execution_id: str):
-    """Create a Langfuse CallbackHandler tagged with the execution_id.
+_langfuse_initialized = False
 
-    Returns None if Langfuse is not configured or unavailable so the executor
-    can degrade gracefully without crashing the workflow run.
+
+def _serialize_for_db(obj):
+    """Recursively convert LangChain BaseMessage objects to plain dicts.
+
+    SQLAlchemy's JSON column uses stdlib json.dumps which cannot handle
+    LangChain message objects returned by create_react_agent.
     """
+    from langchain_core.messages import BaseMessage
+    if isinstance(obj, BaseMessage):
+        return {
+            "type": obj.type,
+            "content": obj.content if isinstance(obj.content, str) else str(obj.content),
+            "name": getattr(obj, "name", None),
+        }
+    if isinstance(obj, dict):
+        return {k: _serialize_for_db(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_serialize_for_db(item) for item in obj]
     try:
-        from langfuse.callback import CallbackHandler
+        import json as _json
+        _json.dumps(obj)
+        return obj
+    except (TypeError, ValueError):
+        return str(obj)
+
+
+def _get_langfuse_handler(execution_id: str):
+    """Return a Langfuse v3 CallbackHandler tagged with the execution_id.
+
+    Initializes the global Langfuse singleton on first call.  Returns None
+    if Langfuse is not configured or the SDK is unavailable so that the
+    executor degrades gracefully without crashing the workflow run.
+    """
+    global _langfuse_initialized
+    try:
+        from langfuse import Langfuse, get_client
+        from langfuse.langchain import CallbackHandler
         from app.config import settings
 
-        return CallbackHandler(
-            public_key=settings.langfuse_public_key,
-            secret_key=settings.langfuse_secret_key,
-            host=settings.langfuse_host,
-            session_id=execution_id,
-            trace_name=f"execution-{execution_id[:8]}",
-        )
+        if not settings.langfuse_public_key or not settings.langfuse_secret_key:
+            logger.warning("Langfuse unavailable, tracing disabled: credentials not set")
+            return None
+
+        if not _langfuse_initialized:
+            Langfuse(
+                public_key=settings.langfuse_public_key,
+                secret_key=settings.langfuse_secret_key,
+                host=settings.langfuse_host,
+            )
+            _langfuse_initialized = True
+
+        return CallbackHandler()
     except Exception as e:
         logger.warning("Langfuse unavailable, tracing disabled: %s", e)
         return None
@@ -107,6 +144,9 @@ class ExecutionService:
 
                 # psycopg3 needs "postgresql://..." not SQLAlchemy's "postgresql+asyncpg://..."
                 pg_url = app_settings.database_url.replace("postgresql+asyncpg://", "postgresql://")
+                # Add timeout options so Supabase/Postgres statement_timeout doesn't kill DDL
+                separator = "&" if "?" in pg_url else "?"
+                pg_url = f"{pg_url}{separator}options=-c%20statement_timeout%3D300000&connect_timeout=10"
                 _ckpt_ctx = AsyncPostgresSaver.from_conn_string(pg_url)
                 checkpointer = await _ckpt_ctx.__aenter__()
                 await checkpointer.setup()
@@ -115,7 +155,7 @@ class ExecutionService:
                     exec_id_str, thread_id or exec_id_str,
                 )
             except Exception as ckpt_err:
-                logger.warning(
+                logger.error(
                     "Checkpointer unavailable — execution will run without memory: %s", ckpt_err
                 )
                 checkpointer = None
@@ -147,6 +187,11 @@ class ExecutionService:
                 config: dict = {"configurable": {"thread_id": effective_thread_id}}
                 if callbacks:
                     config["callbacks"] = callbacks
+                    # Langfuse v3: session/trace identity goes in metadata, not the handler
+                    config["metadata"] = {
+                        "langfuse_session_id": exec_id_str,
+                        "langfuse_trace_name": f"execution-{exec_id_str[:8]}",
+                    }
 
                 # Stream events per node so we can emit live step events
                 result = None
@@ -191,11 +236,12 @@ class ExecutionService:
                     except Exception:
                         pass
 
-                # Persist result
+                # Persist result — serialize LangChain message objects to plain
+                # dicts so SQLAlchemy's JSON column can encode them
                 execution = await db.get(Execution, execution_id)
                 if execution:
                     execution.status = ExecutionStatus.COMPLETED
-                    execution.output = result
+                    execution.output = _serialize_for_db(result)
                     execution.completed_at = datetime.now(timezone.utc)
                     await db.commit()
 

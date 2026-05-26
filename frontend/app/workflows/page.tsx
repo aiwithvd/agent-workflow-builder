@@ -11,8 +11,9 @@ import { useState, useEffect } from "react";
 import { workflowsAPI } from "@/lib/api";
 
 export default function WorkflowsPage() {
-  const { workflows, isLoading, error } = useWorkflows();
+  const { workflows, isLoading, error, remove } = useWorkflows();
   const [templates, setTemplates] = useState<any[]>([]);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -22,6 +23,16 @@ export default function WorkflowsPage() {
       }
     });
   }, []);
+
+  async function handleDelete(e: React.MouseEvent, wfId: string, wfName: string) {
+    e.preventDefault(); // prevent Link navigation
+    e.stopPropagation();
+    if (!confirm(`Delete "${wfName}"? This cannot be undone.`)) return;
+    setDeletingId(wfId);
+    const res = await workflowsAPI.delete(wfId);
+    setDeletingId(null);
+    if (!res.error) remove?.(wfId);
+  }
 
   return (
     <div className="max-w-5xl space-y-8">
@@ -95,32 +106,43 @@ export default function WorkflowsPage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {workflows.map((wf: any) => (
-              <Link key={wf.id} href={`/workflows/${wf.id}`}>
-                <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
-                  <CardBody className="flex flex-col gap-2">
-                    <div className="flex items-start justify-between">
-                      <h3 className="font-semibold text-slate-900 dark:text-slate-100">
-                        {wf.name}
-                      </h3>
-                      {wf.template_name && (
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400">
-                          {wf.template_name}
-                        </span>
+              <div key={wf.id} className="relative group">
+                <Link href={`/workflows/${wf.id}`}>
+                  <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
+                    <CardBody className="flex flex-col gap-2">
+                      <div className="flex items-start justify-between pr-8">
+                        <h3 className="font-semibold text-slate-900 dark:text-slate-100">
+                          {wf.name}
+                        </h3>
+                        {wf.template_name && (
+                          <span className="text-xs px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 shrink-0">
+                            {wf.template_name}
+                          </span>
+                        )}
+                      </div>
+                      {wf.description && (
+                        <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2">
+                          {wf.description}
+                        </p>
                       )}
-                    </div>
-                    {wf.description && (
-                      <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2">
-                        {wf.description}
+                      <p className="text-xs text-slate-400 dark:text-slate-500 mt-auto">
+                        {wf.created_at
+                          ? new Date(wf.created_at).toLocaleDateString()
+                          : "—"}
                       </p>
-                    )}
-                    <p className="text-xs text-slate-400 dark:text-slate-500 mt-auto">
-                      {wf.created_at
-                        ? new Date(wf.created_at).toLocaleDateString()
-                        : "—"}
-                    </p>
-                  </CardBody>
-                </Card>
-              </Link>
+                    </CardBody>
+                  </Card>
+                </Link>
+                {/* Delete button — floats top-right, visible on hover */}
+                <button
+                  onClick={(e) => handleDelete(e, wf.id, wf.name)}
+                  disabled={deletingId === wf.id}
+                  title="Delete workflow"
+                  className="absolute top-3 right-3 z-10 p-1.5 rounded-md text-slate-300 dark:text-slate-600 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 opacity-0 group-hover:opacity-100 transition-all disabled:opacity-50"
+                >
+                  {deletingId === wf.id ? "…" : "🗑"}
+                </button>
+              </div>
             ))}
           </div>
         )}

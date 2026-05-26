@@ -1,0 +1,253 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 640" width="920" height="640" role="img" aria-label="Agent Configurability -- 24 dimensions and 8 presets">
+  <title>Agent Configurability</title>
+
+  <!-- BACKGROUND -->
+  <rect width="920" height="640" rx="12" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- SECTION 1 - PRE-CONFIGURED AGENT PRESETS -->
+  <rect x="10" y="10" width="900" height="210" rx="10" fill="#eef2ff" stroke="#c7d2fe" stroke-width="1"/>
+  <text x="22" y="33" font-family="system-ui,-apple-system,sans-serif" font-size="10" font-weight="700" fill="#4338ca" letter-spacing="1">8 PRE-CONFIGURED AGENT PRESETS</text>
+  <text x="22" y="47" font-family="system-ui,-apple-system,sans-serif" font-size="8.5" fill="#818cf8">Pick any preset -- New Agent form pre-fills all fields -- No manual configuration needed</text>
+
+  <!-- Group label: Research Report Pipeline -->
+  <rect x="22" y="54" width="172" height="14" rx="3" fill="#c7d2fe"/>
+  <text x="108" y="65" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="7.5" font-weight="700" fill="#3730a3">For: Research Report Pipeline</text>
+
+  <!-- Group label: Customer Support Triage -->
+  <rect x="204" y="54" width="382" height="14" rx="3" fill="#fde68a"/>
+  <text x="395" y="65" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="7.5" font-weight="700" fill="#92400e">For: Customer Support Triage</text>
+
+  <!-- Group label: General Purpose -->
+  <rect x="596" y="54" width="312" height="14" rx="3" fill="#d1fae5"/>
+  <text x="752" y="65" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="7.5" font-weight="700" fill="#065f46">General Purpose</text>
+
+  <!-- PRESET CARDS ROW 1 (y=72) -->
+
+  <!-- Researcher (x=22) -->
+  <rect x="22" y="72" width="172" height="68" rx="7" fill="white" stroke="#a5b4fc" stroke-width="1.5"/>
+  <rect x="22" y="72" width="4" height="68" rx="2" fill="#6366f1"/>
+  <text x="42" y="94" font-family="system-ui,-apple-system,sans-serif" font-size="20">&#x1F50D;</text>
+  <text x="72" y="92" font-family="system-ui,-apple-system,sans-serif" font-size="11" font-weight="700" fill="#1e1b4b">Researcher</text>
+  <text x="72" y="104" font-family="system-ui,-apple-system,sans-serif" font-size="8" fill="#6366f1">Research Analyst</text>
+  <rect x="36" y="112" width="62" height="14" rx="3" fill="#c7d2fe"/>
+  <text x="67" y="123" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="7.5" fill="#3730a3">web_search</text>
+  <rect x="104" y="112" width="58" height="14" rx="3" fill="#c7d2fe"/>
+  <text x="133" y="123" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="7.5" fill="#3730a3">calculator</text>
+
+  <!-- Writer (x=204) -->
+  <rect x="204" y="72" width="172" height="68" rx="7" fill="white" stroke="#a5b4fc" stroke-width="1.5"/>
+  <rect x="204" y="72" width="4" height="68" rx="2" fill="#6366f1"/>
+  <text x="224" y="94" font-family="system-ui,-apple-system,sans-serif" font-size="20">&#x270D;&#xFE0F;</text>
+  <text x="254" y="92" font-family="system-ui,-apple-system,sans-serif" font-size="11" font-weight="700" fill="#1e1b4b">Writer</text>
+  <text x="254" y="104" font-family="system-ui,-apple-system,sans-serif" font-size="8" fill="#6366f1">Content Writer</text>
+  <rect x="218" y="112" width="70" height="14" rx="3" fill="#c7d2fe"/>
+  <text x="253" y="123" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="7.5" fill="#3730a3">file_write</text>
+
+  <!-- Classifier (x=386) -->
+  <rect x="386" y="72" width="172" height="68" rx="7" fill="white" stroke="#fcd34d" stroke-width="1.5"/>
+  <rect x="386" y="72" width="4" height="68" rx="2" fill="#d97706"/>
+  <text x="406" y="94" font-family="system-ui,-apple-system,sans-serif" font-size="20">&#x1F5C2;&#xFE0F;</text>
+  <text x="436" y="92" font-family="system-ui,-apple-system,sans-serif" font-size="11" font-weight="700" fill="#92400e">Classifier</text>
+  <text x="436" y="104" font-family="system-ui,-apple-system,sans-serif" font-size="8" fill="#d97706">Triage Classifier</text>
+  <rect x="400" y="112" width="140" height="14" rx="3" fill="#fef3c7"/>
+  <text x="470" y="123" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="7.5" fill="#92400e">zero-shot JSON routing</text>
+
+  <!-- Technical Support (x=568) -->
+  <rect x="568" y="72" width="172" height="68" rx="7" fill="white" stroke="#a5b4fc" stroke-width="1.5"/>
+  <rect x="568" y="72" width="4" height="68" rx="2" fill="#6366f1"/>
+  <text x="588" y="94" font-family="system-ui,-apple-system,sans-serif" font-size="20">&#x1F527;</text>
+  <text x="618" y="92" font-family="system-ui,-apple-system,sans-serif" font-size="10" font-weight="700" fill="#1e1b4b">Technical Support</text>
+  <text x="618" y="104" font-family="system-ui,-apple-system,sans-serif" font-size="8" fill="#6366f1">Tech Specialist</text>
+  <rect x="582" y="112" width="62" height="14" rx="3" fill="#c7d2fe"/>
+  <text x="613" y="123" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="7.5" fill="#3730a3">web_search</text>
+  <rect x="650" y="112" width="58" height="14" rx="3" fill="#c7d2fe"/>
+  <text x="679" y="123" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="7.5" fill="#3730a3">calculator</text>
+
+  <!-- PRESET CARDS ROW 2 (y=152) -->
+
+  <!-- Billing Support (x=22) -->
+  <rect x="22" y="152" width="172" height="58" rx="7" fill="white" stroke="#fcd34d" stroke-width="1.5"/>
+  <rect x="22" y="152" width="4" height="58" rx="2" fill="#d97706"/>
+  <text x="42" y="173" font-family="system-ui,-apple-system,sans-serif" font-size="18">&#x1F4B3;</text>
+  <text x="70" y="171" font-family="system-ui,-apple-system,sans-serif" font-size="11" font-weight="700" fill="#92400e">Billing Support</text>
+  <text x="70" y="183" font-family="system-ui,-apple-system,sans-serif" font-size="8" fill="#d97706">Billing Specialist</text>
+  <rect x="36" y="193" width="58" height="13" rx="3" fill="#fef3c7"/>
+  <text x="65" y="203" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="7.5" fill="#92400e">calculator</text>
+
+  <!-- General Support (x=204) -->
+  <rect x="204" y="152" width="172" height="58" rx="7" fill="white" stroke="#fcd34d" stroke-width="1.5"/>
+  <rect x="204" y="152" width="4" height="58" rx="2" fill="#d97706"/>
+  <text x="224" y="173" font-family="system-ui,-apple-system,sans-serif" font-size="18">&#x1F4AC;</text>
+  <text x="252" y="171" font-family="system-ui,-apple-system,sans-serif" font-size="11" font-weight="700" fill="#92400e">General Support</text>
+  <text x="252" y="183" font-family="system-ui,-apple-system,sans-serif" font-size="8" fill="#d97706">Support Agent</text>
+  <rect x="218" y="193" width="62" height="13" rx="3" fill="#fef3c7"/>
+  <text x="249" y="203" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="7.5" fill="#92400e">web_search</text>
+
+  <!-- Support Specialist (x=386) -->
+  <rect x="386" y="152" width="172" height="58" rx="7" fill="white" stroke="#a5b4fc" stroke-width="1.5"/>
+  <rect x="386" y="152" width="4" height="58" rx="2" fill="#6366f1"/>
+  <text x="406" y="173" font-family="system-ui,-apple-system,sans-serif" font-size="18">&#x1F3A7;</text>
+  <text x="434" y="171" font-family="system-ui,-apple-system,sans-serif" font-size="10" font-weight="700" fill="#1e1b4b">Support Specialist</text>
+  <text x="434" y="183" font-family="system-ui,-apple-system,sans-serif" font-size="8" fill="#6366f1">memory enabled</text>
+  <rect x="400" y="193" width="62" height="13" rx="3" fill="#c7d2fe"/>
+  <text x="431" y="203" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="7.5" fill="#3730a3">web_search</text>
+  <rect x="468" y="193" width="68" height="13" rx="3" fill="#c7d2fe"/>
+  <text x="502" y="203" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="7.5" fill="#3730a3">http_request</text>
+
+  <!-- Data Analyst (x=568) -->
+  <rect x="568" y="152" width="172" height="58" rx="7" fill="white" stroke="#a5b4fc" stroke-width="1.5"/>
+  <rect x="568" y="152" width="4" height="58" rx="2" fill="#6366f1"/>
+  <text x="588" y="173" font-family="system-ui,-apple-system,sans-serif" font-size="18">&#x1F4CA;</text>
+  <text x="616" y="171" font-family="system-ui,-apple-system,sans-serif" font-size="11" font-weight="700" fill="#1e1b4b">Data Analyst</text>
+  <text x="616" y="183" font-family="system-ui,-apple-system,sans-serif" font-size="8" fill="#6366f1">Data Analysis Expert</text>
+  <rect x="582" y="193" width="58" height="13" rx="3" fill="#c7d2fe"/>
+  <text x="611" y="203" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="7.5" fill="#3730a3">calculator</text>
+  <rect x="646" y="193" width="50" height="13" rx="3" fill="#c7d2fe"/>
+  <text x="671" y="203" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="7.5" fill="#3730a3">file_read</text>
+  <rect x="702" y="193" width="54" height="13" rx="3" fill="#c7d2fe"/>
+  <text x="729" y="203" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="7.5" fill="#3730a3">file_write</text>
+
+  <!-- Default note -->
+  <text x="750" y="35" font-family="system-ui,-apple-system,sans-serif" font-size="8" fill="#94a3b8" text-anchor="end">Default: Ollama llama3.2 -- all presets editable after creation</text>
+
+  <!-- DIVIDER -->
+  <line x1="10" y1="228" x2="910" y2="228" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="460" y="245" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="10" font-weight="700" fill="#374151" letter-spacing="1">CONFIGURATION DIMENSIONS -- 24 PER AGENT, INDEPENDENTLY ADJUSTABLE</text>
+
+  <!-- SECTION 2 - DIMENSION CATEGORY BOXES (2 rows x 3 columns) -->
+  <!-- Row 1 y=255, Row 2 y=437 / Col 1 x=20, Col 2 x=318, Col 3 x=616 -->
+
+  <!-- Box 1: Basic Identity (x=20, y=255) -->
+  <rect x="20" y="255" width="284" height="168" rx="8" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+  <rect x="20" y="255" width="284" height="30" rx="8" fill="#e0e7ff"/>
+  <rect x="20" y="270" width="284" height="15" fill="#e0e7ff"/>
+  <text x="34" y="275" font-family="system-ui,-apple-system,sans-serif" font-size="11" font-weight="700" fill="#3730a3">Basic Identity</text>
+  <rect x="268" y="260" width="28" height="16" rx="8" fill="#6366f1"/>
+  <text x="282" y="272" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="9" font-weight="700" fill="white">3</text>
+  <circle cx="33" cy="301" r="2.5" fill="#6366f1"/>
+  <text x="42" y="305" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#1e293b" font-weight="600">name</text>
+  <text x="100" y="305" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#64748b">-- agent display name</text>
+  <circle cx="33" cy="321" r="2.5" fill="#6366f1"/>
+  <text x="42" y="325" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#1e293b" font-weight="600">role</text>
+  <text x="80" y="325" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#64748b">-- e.g. Researcher, Analyst</text>
+  <circle cx="33" cy="341" r="2.5" fill="#6366f1"/>
+  <text x="42" y="345" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#1e293b" font-weight="600">system_prompt</text>
+  <text x="42" y="358" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#64748b">      full behavioral specification (textarea)</text>
+
+  <!-- Box 2: Model Configuration (x=318, y=255) -->
+  <rect x="318" y="255" width="284" height="168" rx="8" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+  <rect x="318" y="255" width="284" height="30" rx="8" fill="#dbeafe"/>
+  <rect x="318" y="270" width="284" height="15" fill="#dbeafe"/>
+  <text x="332" y="275" font-family="system-ui,-apple-system,sans-serif" font-size="11" font-weight="700" fill="#1d4ed8">Model Configuration</text>
+  <rect x="566" y="260" width="28" height="16" rx="8" fill="#3b82f6"/>
+  <text x="580" y="272" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="9" font-weight="700" fill="white">6</text>
+  <circle cx="331" cy="301" r="2.5" fill="#3b82f6"/>
+  <text x="340" y="305" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#1e293b" font-weight="600">provider</text>
+  <text x="340" y="317" font-family="system-ui,-apple-system,sans-serif" font-size="8.5" fill="#64748b">      ollama / openrouter / glm51 / glm51-local</text>
+  <circle cx="331" cy="327" r="2.5" fill="#3b82f6"/>
+  <text x="340" y="331" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#1e293b" font-weight="600">model</text>
+  <text x="386" y="331" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#64748b">-- any model the provider supports</text>
+  <circle cx="331" cy="343" r="2.5" fill="#3b82f6"/>
+  <text x="340" y="347" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#1e293b" font-weight="600">temperature</text>
+  <text x="416" y="347" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#64748b">-- 0.0 to 2.0</text>
+  <circle cx="331" cy="359" r="2.5" fill="#3b82f6"/>
+  <text x="340" y="363" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#1e293b" font-weight="600">top_p</text>
+  <text x="378" y="363" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#64748b">-- 0.0 to 1.0 nucleus sampling</text>
+  <circle cx="331" cy="375" r="2.5" fill="#3b82f6"/>
+  <text x="340" y="379" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#1e293b" font-weight="600">presence_penalty</text>
+  <text x="443" y="379" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#64748b">-- -2 to 2</text>
+  <circle cx="331" cy="391" r="2.5" fill="#3b82f6"/>
+  <text x="340" y="395" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#1e293b" font-weight="600">frequency_penalty</text>
+  <text x="447" y="395" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#64748b">-- -2 to 2</text>
+
+  <!-- Box 3: Execution Control and Channel Routing (x=616, y=255) -->
+  <rect x="616" y="255" width="284" height="168" rx="8" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+  <rect x="616" y="255" width="284" height="30" rx="8" fill="#ede9fe"/>
+  <rect x="616" y="270" width="284" height="15" fill="#ede9fe"/>
+  <text x="630" y="275" font-family="system-ui,-apple-system,sans-serif" font-size="11" font-weight="700" fill="#5b21b6">Execution &amp; Channel</text>
+  <rect x="864" y="260" width="28" height="16" rx="8" fill="#7c3aed"/>
+  <text x="878" y="272" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="9" font-weight="700" fill="white">4</text>
+  <circle cx="629" cy="301" r="2.5" fill="#7c3aed"/>
+  <text x="638" y="305" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#1e293b" font-weight="600">max_iterations</text>
+  <text x="638" y="317" font-family="system-ui,-apple-system,sans-serif" font-size="8.5" fill="#64748b">      1-50 -- caps the ReAct reasoning loop</text>
+  <line x1="630" y1="327" x2="890" y2="327" stroke="#f1f5f9" stroke-width="1"/>
+  <text x="638" y="340" font-family="system-ui,-apple-system,sans-serif" font-size="8.5" fill="#7c3aed" font-weight="600">Channel Routing</text>
+  <circle cx="629" cy="353" r="2.5" fill="#7c3aed"/>
+  <text x="638" y="357" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#1e293b" font-weight="600">web</text>
+  <text x="666" y="357" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#64748b">-- available for UI / REST execution</text>
+  <circle cx="629" cy="369" r="2.5" fill="#7c3aed"/>
+  <text x="638" y="373" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#1e293b" font-weight="600">telegram</text>
+  <text x="690" y="373" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#64748b">-- ChannelRouter bot routing</text>
+  <circle cx="629" cy="385" r="2.5" fill="#7c3aed"/>
+  <text x="638" y="389" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#1e293b" font-weight="600">api</text>
+  <text x="660" y="389" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#64748b">-- callable via REST endpoint</text>
+
+  <!-- Box 4: Tool Access (x=20, y=437) -->
+  <rect x="20" y="437" width="284" height="168" rx="8" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+  <rect x="20" y="437" width="284" height="30" rx="8" fill="#dcfce7"/>
+  <rect x="20" y="452" width="284" height="15" fill="#dcfce7"/>
+  <text x="34" y="457" font-family="system-ui,-apple-system,sans-serif" font-size="11" font-weight="700" fill="#15803d">Tool Access</text>
+  <rect x="268" y="442" width="28" height="16" rx="8" fill="#16a34a"/>
+  <text x="282" y="454" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="9" font-weight="700" fill="white">7</text>
+  <circle cx="33" cy="483" r="2.5" fill="#16a34a"/>
+  <text x="42" y="487" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#1e293b" font-weight="600">web_search</text>
+  <text x="160" y="487" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#64748b">-- internet search</text>
+  <circle cx="33" cy="499" r="2.5" fill="#16a34a"/>
+  <text x="42" y="503" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#1e293b" font-weight="600">get_weather</text>
+  <text x="160" y="503" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#64748b">-- OpenWeatherMap</text>
+  <circle cx="33" cy="515" r="2.5" fill="#16a34a"/>
+  <text x="42" y="519" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#1e293b" font-weight="600">calculator</text>
+  <text x="160" y="519" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#64748b">-- safe math eval</text>
+  <circle cx="33" cy="531" r="2.5" fill="#16a34a"/>
+  <text x="42" y="535" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#1e293b" font-weight="600">code_executor</text>
+  <text x="160" y="535" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#64748b">-- Python snippet</text>
+  <circle cx="33" cy="547" r="2.5" fill="#16a34a"/>
+  <text x="42" y="551" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#1e293b" font-weight="600">http_request</text>
+  <text x="160" y="551" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#64748b">-- arbitrary HTTP calls</text>
+  <circle cx="33" cy="563" r="2.5" fill="#16a34a"/>
+  <text x="42" y="567" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#1e293b" font-weight="600">file_read</text>
+  <text x="160" y="567" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#64748b">-- read from filesystem</text>
+  <circle cx="33" cy="579" r="2.5" fill="#16a34a"/>
+  <text x="42" y="583" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#1e293b" font-weight="600">file_write</text>
+  <text x="160" y="583" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#64748b">-- write to filesystem</text>
+  <text x="34" y="597" font-family="system-ui,-apple-system,sans-serif" font-size="7.5" fill="#94a3b8" font-style="italic">Each tool independently toggled per agent</text>
+
+  <!-- Box 5: Memory and Guardrails (x=318, y=437) -->
+  <rect x="318" y="437" width="284" height="168" rx="8" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+  <rect x="318" y="437" width="284" height="30" rx="8" fill="#fef3c7"/>
+  <rect x="318" y="452" width="284" height="15" fill="#fef3c7"/>
+  <text x="332" y="457" font-family="system-ui,-apple-system,sans-serif" font-size="11" font-weight="700" fill="#92400e">Memory &amp; Guardrails</text>
+  <rect x="566" y="442" width="28" height="16" rx="8" fill="#d97706"/>
+  <text x="580" y="454" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="9" font-weight="700" fill="white">4</text>
+  <circle cx="331" cy="483" r="2.5" fill="#d97706"/>
+  <text x="340" y="487" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#1e293b" font-weight="600">memory_enabled</text>
+  <text x="340" y="499" font-family="system-ui,-apple-system,sans-serif" font-size="8.5" fill="#64748b">      AsyncPostgresSaver -- persists across runs</text>
+  <line x1="330" y1="509" x2="592" y2="509" stroke="#f1f5f9" stroke-width="1"/>
+  <text x="340" y="522" font-family="system-ui,-apple-system,sans-serif" font-size="8.5" fill="#d97706" font-weight="600">Guardrails</text>
+  <circle cx="331" cy="533" r="2.5" fill="#d97706"/>
+  <text x="340" y="537" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#1e293b" font-weight="600">guardrails.max_tokens</text>
+  <text x="340" y="549" font-family="system-ui,-apple-system,sans-serif" font-size="8.5" fill="#64748b">      hard cap per LLM response</text>
+  <circle cx="331" cy="559" r="2.5" fill="#d97706"/>
+  <text x="340" y="563" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#1e293b" font-weight="600">guardrails.rate_limit</text>
+  <text x="340" y="575" font-family="system-ui,-apple-system,sans-serif" font-size="8.5" fill="#64748b">      max requests/min for this agent</text>
+
+  <!-- Box 6: Scheduling + summary (x=616, y=437) -->
+  <rect x="616" y="437" width="284" height="168" rx="8" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+  <rect x="616" y="437" width="284" height="30" rx="8" fill="#fee2e2"/>
+  <rect x="616" y="452" width="284" height="15" fill="#fee2e2"/>
+  <text x="630" y="457" font-family="system-ui,-apple-system,sans-serif" font-size="11" font-weight="700" fill="#991b1b">Scheduling</text>
+  <rect x="864" y="442" width="28" height="16" rx="8" fill="#dc2626"/>
+  <text x="878" y="454" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="9" font-weight="700" fill="white">1</text>
+  <circle cx="629" cy="483" r="2.5" fill="#dc2626"/>
+  <text x="638" y="487" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#1e293b" font-weight="600">schedule</text>
+  <text x="638" y="499" font-family="system-ui,-apple-system,sans-serif" font-size="8.5" fill="#64748b">      cron string -- APScheduler registers job</text>
+  <text x="638" y="511" font-family="system-ui,-apple-system,sans-serif" font-size="8.5" fill="#64748b">      e.g. "0 9 * * *" = daily at 9am UTC</text>
+  <line x1="630" y1="525" x2="890" y2="525" stroke="#f1f5f9" stroke-width="1"/>
+  <rect x="630" y="534" width="256" height="50" rx="6" fill="#f0fdf4" stroke="#86efac" stroke-width="1"/>
+  <text x="758" y="552" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="11" font-weight="700" fill="#15803d">24 configurable dimensions</text>
+  <text x="758" y="566" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8.5" fill="#16a34a">across 6 categories -- all nullable / optional</text>
+  <text x="758" y="578" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8.5" fill="#16a34a">plus 8 ready-to-use preset templates</text>
+
+  <!-- CAPTION -->
+  <text x="460" y="625" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="9.5" fill="#94a3b8" font-style="italic">All fields stored in PostgreSQL -- Pydantic v2 validated at API boundary -- LLM params forwarded to create_llm() -- LangGraph agent</text>
+</svg>

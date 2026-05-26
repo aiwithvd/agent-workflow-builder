@@ -68,6 +68,7 @@ async function apiCall<T>(
 // Agents API
 export const agentsAPI = {
   list: () => apiCall("/agents"),
+  presets: () => apiCall<any[]>("/agents/presets"),
   get: (id: string) => apiCall(`/agents/${id}`),
   create: (data: any) =>
     apiCall("/agents", { method: "POST", body: JSON.stringify(data) }),

@@ -137,6 +137,52 @@ async def test_get_execution_messages_empty(client):
 
 
 @pytest.mark.asyncio
+async def test_execution_messages_response_schema(client, app):
+    """Verify messages endpoint returns correct field names (not agent_id/token_count)."""
+    from app.database import async_session
+    from app.models import Execution, Message, Workflow
+    from app.enums import MessageType, MessageChannel
+    import uuid
+
+    wf_id = await _create_workflow(client)
+
+    with patch("app.routers.executions.execution_service.execute_workflow", new_callable=AsyncMock):
+        create_resp = await client.post("/api/v1/executions", json={"workflow_id": wf_id, "input": {}})
+
+    exec_id = create_resp.json()["id"]
+
+    # Insert a message directly to verify the response schema
+    async with async_session() as db:
+        msg = Message(
+            id=uuid.uuid4(),
+            execution_id=uuid.UUID(exec_id),
+            from_agent="researcher",
+            to_agent=None,
+            content="This is a test response.",
+            message_type=MessageType.AGENT_RESPONSE,
+            channel=MessageChannel.WEB,
+            tokens_used=42,
+        )
+        db.add(msg)
+        await db.commit()
+
+    resp = await client.get(f"/api/v1/executions/{exec_id}/messages")
+    assert resp.status_code == 200
+    messages = resp.json()
+    assert len(messages) == 1
+    msg_data = messages[0]
+    # Verify correct field names (not the stale agent_id / token_count)
+    assert "from_agent" in msg_data
+    assert "to_agent" in msg_data
+    assert "tokens_used" in msg_data
+    assert "agent_id" not in msg_data
+    assert "token_count" not in msg_data
+    assert msg_data["from_agent"] == "researcher"
+    assert msg_data["tokens_used"] == 42
+    assert msg_data["content"] == "This is a test response."
+
+
+@pytest.mark.asyncio
 async def test_list_executions_filter_by_workflow(client):
     wf_id = await _create_workflow(client)
 

@@ -1,0 +1,237 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 780" font-family="system-ui, -apple-system, sans-serif">
+  <!-- Background -->
+  <rect width="1100" height="780" fill="#f8fafc" rx="12"/>
+
+  <!-- ===== FRONTEND BOX ===== -->
+  <rect x="20" y="20" width="320" height="230" rx="10" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="180" y="44" text-anchor="middle" font-size="12" font-weight="700" fill="#4338ca">Next.js Frontend :4000</text>
+
+  <!-- Frontend nodes -->
+  <rect x="40" y="55" width="130" height="38" rx="6" fill="#fff" stroke="#a5b4fc" stroke-width="1"/>
+  <text x="105" y="70" text-anchor="middle" font-size="10" font-weight="600" fill="#4338ca">React Flow Canvas</text>
+  <text x="105" y="83" text-anchor="middle" font-size="9" fill="#6366f1">drag-drop builder</text>
+
+  <rect x="185" y="55" width="130" height="38" rx="6" fill="#fff" stroke="#a5b4fc" stroke-width="1"/>
+  <text x="250" y="70" text-anchor="middle" font-size="10" font-weight="600" fill="#4338ca">Agent / Workflow</text>
+  <text x="250" y="83" text-anchor="middle" font-size="9" fill="#6366f1">CRUD Management</text>
+
+  <rect x="40" y="105" width="130" height="38" rx="6" fill="#fff" stroke="#a5b4fc" stroke-width="1"/>
+  <text x="105" y="120" text-anchor="middle" font-size="10" font-weight="600" fill="#4338ca">Execution Monitor</text>
+  <text x="105" y="133" text-anchor="middle" font-size="9" fill="#6366f1">WebSocket + polling</text>
+
+  <rect x="185" y="105" width="130" height="38" rx="6" fill="#fff" stroke="#a5b4fc" stroke-width="1"/>
+  <text x="250" y="120" text-anchor="middle" font-size="10" font-weight="600" fill="#4338ca">Agent Presets</text>
+  <text x="250" y="133" text-anchor="middle" font-size="9" fill="#6366f1">5 ready templates</text>
+
+  <rect x="40" y="155" width="130" height="38" rx="6" fill="#fff" stroke="#a5b4fc" stroke-width="1"/>
+  <text x="105" y="170" text-anchor="middle" font-size="10" font-weight="600" fill="#4338ca">Settings Page</text>
+  <text x="105" y="183" text-anchor="middle" font-size="9" fill="#6366f1">credentials store</text>
+
+  <rect x="185" y="155" width="130" height="38" rx="6" fill="#fff" stroke="#a5b4fc" stroke-width="1"/>
+  <text x="250" y="170" text-anchor="middle" font-size="10" font-weight="600" fill="#4338ca">Template Gallery</text>
+  <text x="250" y="183" text-anchor="middle" font-size="9" fill="#6366f1">2 workflow templates</text>
+
+  <!-- ===== BACKEND BOX ===== -->
+  <rect x="380" y="20" width="420" height="430" rx="10" fill="#f0fdf4" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="590" y="44" text-anchor="middle" font-size="12" font-weight="700" fill="#15803d">FastAPI Backend :8000</text>
+
+  <!-- Routers -->
+  <rect x="400" y="55" width="100" height="38" rx="6" fill="#fff" stroke="#86efac" stroke-width="1"/>
+  <text x="450" y="70" text-anchor="middle" font-size="9" font-weight="600" fill="#15803d">Agents Router</text>
+  <text x="450" y="83" text-anchor="middle" font-size="8" fill="#16a34a">CRUD + Presets</text>
+
+  <rect x="510" y="55" width="110" height="38" rx="6" fill="#fff" stroke="#86efac" stroke-width="1"/>
+  <text x="565" y="70" text-anchor="middle" font-size="9" font-weight="600" fill="#15803d">Workflows Router</text>
+  <text x="565" y="83" text-anchor="middle" font-size="8" fill="#16a34a">+ TriggerActivator</text>
+
+  <rect x="630" y="55" width="110" height="38" rx="6" fill="#fff" stroke="#86efac" stroke-width="1"/>
+  <text x="685" y="70" text-anchor="middle" font-size="9" font-weight="600" fill="#15803d">Executions Router</text>
+  <text x="685" y="83" text-anchor="middle" font-size="8" fill="#16a34a">WebSocket + REST</text>
+
+  <rect x="750" y="55" width="35" height="38" rx="6" fill="#fff" stroke="#86efac" stroke-width="1"/>
+  <text x="767" y="70" text-anchor="middle" font-size="9" font-weight="600" fill="#15803d">⚙</text>
+  <text x="767" y="83" text-anchor="middle" font-size="7" fill="#16a34a">Settings</text>
+
+  <!-- Runtime box -->
+  <rect x="400" y="110" width="380" height="220" rx="8" fill="#dcfce7" stroke="#86efac" stroke-width="1"/>
+  <text x="590" y="128" text-anchor="middle" font-size="10" font-weight="700" fill="#15803d">LangGraph Runtime (backend/app/runtime/)</text>
+
+  <rect x="415" y="135" width="120" height="48" rx="6" fill="#fff" stroke="#4ade80" stroke-width="1"/>
+  <text x="475" y="152" text-anchor="middle" font-size="9" font-weight="600" fill="#15803d">Graph Builder</text>
+  <text x="475" y="163" text-anchor="middle" font-size="8" fill="#16a34a">React Flow JSON →</text>
+  <text x="475" y="174" text-anchor="middle" font-size="8" fill="#16a34a">LangGraph StateGraph</text>
+
+  <rect x="545" y="135" width="120" height="48" rx="6" fill="#fff" stroke="#4ade80" stroke-width="1"/>
+  <text x="605" y="152" text-anchor="middle" font-size="9" font-weight="600" fill="#15803d">Executor</text>
+  <text x="605" y="163" text-anchor="middle" font-size="8" fill="#16a34a">astream_events v2</text>
+  <text x="605" y="174" text-anchor="middle" font-size="8" fill="#16a34a">per-step streaming</text>
+
+  <rect x="675" y="135" width="90" height="48" rx="6" fill="#fff" stroke="#4ade80" stroke-width="1"/>
+  <text x="720" y="152" text-anchor="middle" font-size="9" font-weight="600" fill="#15803d">LLM Factory</text>
+  <text x="720" y="163" text-anchor="middle" font-size="8" fill="#16a34a">Ollama / OR</text>
+  <text x="720" y="174" text-anchor="middle" font-size="8" fill="#16a34a">GLM-5.1 / temp</text>
+
+  <rect x="415" y="195" width="120" height="38" rx="6" fill="#fff" stroke="#4ade80" stroke-width="1"/>
+  <text x="475" y="210" text-anchor="middle" font-size="9" font-weight="600" fill="#15803d">Event Bus</text>
+  <text x="475" y="223" text-anchor="middle" font-size="8" fill="#16a34a">asyncio.Queue pub/sub</text>
+
+  <rect x="545" y="195" width="120" height="38" rx="6" fill="#fff" stroke="#4ade80" stroke-width="1"/>
+  <text x="605" y="210" text-anchor="middle" font-size="9" font-weight="600" fill="#15803d">Supervisor Agent</text>
+  <text x="605" y="223" text-anchor="middle" font-size="8" fill="#16a34a">orchestrator node</text>
+
+  <rect x="675" y="195" width="90" height="38" rx="6" fill="#fff" stroke="#4ade80" stroke-width="1"/>
+  <text x="720" y="210" text-anchor="middle" font-size="9" font-weight="600" fill="#15803d">Tools Registry</text>
+  <text x="720" y="223" text-anchor="middle" font-size="8" fill="#16a34a">7 built-in tools</text>
+
+  <!-- Scheduler and channel router -->
+  <rect x="400" y="345" width="180" height="38" rx="6" fill="#fff" stroke="#86efac" stroke-width="1"/>
+  <text x="490" y="360" text-anchor="middle" font-size="9" font-weight="600" fill="#15803d">APScheduler</text>
+  <text x="490" y="373" text-anchor="middle" font-size="8" fill="#16a34a">AsyncIOScheduler · cron triggers</text>
+
+  <rect x="595" y="345" width="190" height="38" rx="6" fill="#fff" stroke="#86efac" stroke-width="1"/>
+  <text x="690" y="360" text-anchor="middle" font-size="9" font-weight="600" fill="#15803d">Telegram Bot + ChannelRouter</text>
+  <text x="690" y="373" text-anchor="middle" font-size="8" fill="#16a34a">python-telegram-bot 20+</text>
+
+  <rect x="400" y="395" width="380" height="38" rx="6" fill="#fff" stroke="#86efac" stroke-width="1"/>
+  <text x="590" y="410" text-anchor="middle" font-size="9" font-weight="600" fill="#15803d">SQLAlchemy 2.0 async (asyncpg) + Alembic Migrations</text>
+  <text x="590" y="423" text-anchor="middle" font-size="8" fill="#16a34a">Agent · Workflow · Execution · Message · Trigger · Settings models</text>
+
+  <!-- ===== STORAGE BOX ===== -->
+  <rect x="20" y="290" width="320" height="180" rx="10" fill="#fefce8" stroke="#eab308" stroke-width="1.5"/>
+  <text x="180" y="314" text-anchor="middle" font-size="12" font-weight="700" fill="#854d0e">Storage</text>
+
+  <rect x="40" y="325" width="130" height="62" rx="6" fill="#fff" stroke="#fde68a" stroke-width="1"/>
+  <text x="105" y="342" text-anchor="middle" font-size="10" font-weight="600" fill="#854d0e">PostgreSQL</text>
+  <text x="105" y="355" text-anchor="middle" font-size="8" fill="#92400e">agents · workflows</text>
+  <text x="105" y="366" text-anchor="middle" font-size="8" fill="#92400e">executions · messages</text>
+  <text x="105" y="377" text-anchor="middle" font-size="8" fill="#92400e">triggers · settings</text>
+
+  <rect x="185" y="325" width="130" height="62" rx="6" fill="#fff" stroke="#fde68a" stroke-width="1"/>
+  <text x="250" y="342" text-anchor="middle" font-size="10" font-weight="600" fill="#854d0e">Redis</text>
+  <text x="250" y="355" text-anchor="middle" font-size="8" fill="#92400e">Telegram session state</text>
+  <text x="250" y="366" text-anchor="middle" font-size="8" fill="#92400e">pub/sub events</text>
+
+  <rect x="40" y="405" width="275" height="48" rx="6" fill="#fff" stroke="#fde68a" stroke-width="1"/>
+  <text x="177" y="421" text-anchor="middle" font-size="9" font-weight="600" fill="#854d0e">Agent Presets (JSON files)</text>
+  <text x="177" y="434" text-anchor="middle" font-size="8" fill="#92400e">backend/agent_presets/ · 5 pre-configured roles</text>
+  <text x="177" y="445" text-anchor="middle" font-size="8" fill="#92400e">Researcher · Writer · Classifier · Support · Analyst</text>
+
+  <!-- ===== OBSERVABILITY BOX ===== -->
+  <rect x="20" y="490" width="320" height="120" rx="10" fill="#fdf4ff" stroke="#a855f7" stroke-width="1.5"/>
+  <text x="180" y="514" text-anchor="middle" font-size="12" font-weight="700" fill="#7e22ce">Observability :3000</text>
+
+  <rect x="40" y="525" width="275" height="68" rx="6" fill="#fff" stroke="#d8b4fe" stroke-width="1"/>
+  <text x="177" y="542" text-anchor="middle" font-size="10" font-weight="600" fill="#7e22ce">Langfuse v2 (self-hosted)</text>
+  <text x="177" y="555" text-anchor="middle" font-size="8" fill="#9333ea">Token tracking · cost per execution · latency</text>
+  <text x="177" y="566" text-anchor="middle" font-size="8" fill="#9333ea">Per-step trace tree · LangChain CallbackHandler</text>
+  <text x="177" y="577" text-anchor="middle" font-size="8" fill="#9333ea">Historical replay · data stays self-hosted</text>
+
+  <!-- ===== LANGGRAPH SERVER BOX ===== -->
+  <rect x="820" y="20" width="260" height="200" rx="10" fill="#fff7ed" stroke="#f97316" stroke-width="1.5" stroke-dasharray="6,3"/>
+  <text x="950" y="44" text-anchor="middle" font-size="12" font-weight="700" fill="#c2410c">LangGraph Server :8123</text>
+  <text x="950" y="57" text-anchor="middle" font-size="9" fill="#ea580c">(optional — --profile langgraph)</text>
+
+  <rect x="840" y="68" width="220" height="50" rx="6" fill="#fff" stroke="#fdba74" stroke-width="1"/>
+  <text x="950" y="87" text-anchor="middle" font-size="10" font-weight="600" fill="#c2410c">meta-graph dispatcher</text>
+  <text x="950" y="100" text-anchor="middle" font-size="8" fill="#ea580c">dynamic_workflow factory</text>
+  <text x="950" y="111" text-anchor="middle" font-size="8" fill="#ea580c">30+ REST + SSE endpoints</text>
+
+  <rect x="840" y="130" width="220" height="38" rx="6" fill="#fff" stroke="#fdba74" stroke-width="1"/>
+  <text x="950" y="148" text-anchor="middle" font-size="9" font-weight="600" fill="#c2410c">AsyncPostgresSaver</text>
+  <text x="950" y="161" text-anchor="middle" font-size="8" fill="#ea580c">thread checkpointing · resumable state</text>
+
+  <rect x="840" y="180" width="220" height="30" rx="6" fill="#fff" stroke="#fdba74" stroke-width="1"/>
+  <text x="950" y="200" text-anchor="middle" font-size="8" fill="#ea580c">langgraph dev (open-source dev server)</text>
+
+  <!-- ===== ARROWS ===== -->
+  <!-- Frontend → Backend REST -->
+  <line x1="340" y1="80" x2="380" y2="80" stroke="#6366f1" stroke-width="1.5" marker-end="url(#arr-indigo)"/>
+  <text x="360" y="76" text-anchor="middle" font-size="8" fill="#6366f1">REST</text>
+
+  <!-- Frontend → Backend WebSocket -->
+  <line x1="340" y1="125" x2="380" y2="125" stroke="#6366f1" stroke-width="1.5" marker-end="url(#arr-indigo)"/>
+  <text x="360" y="121" text-anchor="middle" font-size="8" fill="#6366f1">WS</text>
+
+  <!-- Backend → Storage -->
+  <line x1="380" y1="395" x2="340" y2="380" stroke="#22c55e" stroke-width="1.5" marker-end="url(#arr-green)"/>
+
+  <!-- Backend → Observability -->
+  <line x1="450" y1="460" x2="280" y2="490" stroke="#22c55e" stroke-width="1.5" marker-end="url(#arr-green)" stroke-dasharray="4,2"/>
+  <text x="355" y="478" text-anchor="middle" font-size="8" fill="#22c55e">Langfuse CB</text>
+
+  <!-- Backend → LangGraph Server -->
+  <line x1="800" y1="120" x2="820" y2="120" stroke="#22c55e" stroke-width="1.5" marker-end="url(#arr-green)" stroke-dasharray="4,2"/>
+  <text x="810" y="115" text-anchor="middle" font-size="8" fill="#22c55e">optional</text>
+
+  <!-- Telegram → Backend -->
+  <path d="M 690 383 L 690 410 L 590 410" stroke="#22c55e" stroke-width="1.2" fill="none" marker-end="url(#arr-green)"/>
+
+  <!-- ===== LEGEND ===== -->
+  <rect x="820" y="240" width="260" height="290" rx="10" fill="#fff" stroke="#cbd5e1" stroke-width="1"/>
+  <text x="950" y="262" text-anchor="middle" font-size="11" font-weight="700" fill="#334155">Architecture Highlights</text>
+
+  <circle cx="840" cy="285" r="4" fill="#6366f1"/>
+  <text x="850" y="289" font-size="9" fill="#334155">Visual drag-drop canvas → LangGraph graph</text>
+
+  <circle cx="840" cy="307" r="4" fill="#22c55e"/>
+  <text x="850" y="311" font-size="9" fill="#334155">Per-step streaming via astream_events v2</text>
+
+  <circle cx="840" cy="329" r="4" fill="#a855f7"/>
+  <text x="850" y="333" font-size="9" fill="#334155">Langfuse: token, cost, latency per step</text>
+
+  <circle cx="840" cy="351" r="4" fill="#eab308"/>
+  <text x="850" y="355" font-size="9" fill="#334155">PostgreSQL JSONB: workflow graph storage</text>
+
+  <circle cx="840" cy="373" r="4" fill="#f97316"/>
+  <text x="850" y="377" font-size="9" fill="#334155">Telegram: async message delivery</text>
+
+  <circle cx="840" cy="395" r="4" fill="#14b8a6"/>
+  <text x="850" y="399" font-size="9" fill="#334155">APScheduler: cron-triggered workflows</text>
+
+  <circle cx="840" cy="417" r="4" fill="#ef4444"/>
+  <text x="850" y="421" font-size="9" fill="#334155">25+ agent config dimensions</text>
+
+  <circle cx="840" cy="439" r="4" fill="#8b5cf6"/>
+  <text x="850" y="443" font-size="9" fill="#334155">5 pre-built agent presets (NEW)</text>
+
+  <circle cx="840" cy="461" r="4" fill="#ec4899"/>
+  <text x="850" y="465" font-size="9" fill="#334155">Workflow edit/rename/delete (NEW)</text>
+
+  <circle cx="840" cy="483" r="4" fill="#06b6d4"/>
+  <text x="850" y="487" font-size="9" fill="#334155">Single command: docker compose up</text>
+
+  <!-- Agent Config dimensions box -->
+  <rect x="820" y="545" width="260" height="210" rx="10" fill="#eff6ff" stroke="#93c5fd" stroke-width="1"/>
+  <text x="950" y="566" text-anchor="middle" font-size="11" font-weight="700" fill="#1d4ed8">Agent Config Dimensions</text>
+
+  <text x="835" y="584" font-size="8" fill="#1e40af">Basic:  name · role · system_prompt</text>
+  <text x="835" y="598" font-size="8" fill="#1e40af">Model:  provider · model_name</text>
+  <text x="835" y="612" font-size="8" fill="#1e40af">LLM:    temperature · top_p · presence_penalty</text>
+  <text x="835" y="626" font-size="8" fill="#1e40af">          frequency_penalty · max_iterations</text>
+  <text x="835" y="640" font-size="8" fill="#1e40af">Tools:  web_search · calculator · file_read</text>
+  <text x="835" y="654" font-size="8" fill="#1e40af">          file_write · weather · http_request</text>
+  <text x="835" y="668" font-size="8" fill="#1e40af">          code_executor  (7 tools)</text>
+  <text x="835" y="682" font-size="8" fill="#1e40af">Channel: web · telegram · api</text>
+  <text x="835" y="696" font-size="8" fill="#1e40af">Memory: memory_enabled</text>
+  <text x="835" y="710" font-size="8" fill="#1e40af">Guard:  max_tokens · rate_limit</text>
+  <text x="835" y="724" font-size="8" fill="#1e40af">Sched:  schedule (cron expression)</text>
+
+  <rect x="835" y="732" width="230" height="18" rx="4" fill="#1d4ed8"/>
+  <text x="950" y="745" text-anchor="middle" font-size="9" font-weight="700" fill="#fff">25+ independently configurable dimensions</text>
+
+  <!-- Title -->
+  <text x="550" y="750" text-anchor="middle" font-size="11" font-weight="700" fill="#475569">Agent Orchestration Platform — Architecture Overview</text>
+
+  <!-- Arrow markers -->
+  <defs>
+    <marker id="arr-indigo" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#6366f1"/>
+    </marker>
+    <marker id="arr-green" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#22c55e"/>
+    </marker>
+    <marker id="arr-gray" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+</svg>

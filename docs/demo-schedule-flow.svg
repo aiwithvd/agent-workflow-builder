@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 250" width="880" height="250" role="img" aria-label="Scheduled Workflow diagram">
+  <title>Scheduled Workflow</title>
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L10 5L0 10z" fill="#94a3b8"/>
+    </marker>
+    <marker id="arr-s" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L10 5L0 10z" fill="#d97706"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="880" height="250" rx="12" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- APScheduler (far left) -->
+  <rect x="14" y="80" width="130" height="90" rx="8" fill="#fffbeb" stroke="#d97706" stroke-width="1.5"/>
+  <text x="79" y="110" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="20">&#x23F0;</text>
+  <text x="79" y="127" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="10" font-weight="700" fill="#92400e">APScheduler</text>
+  <text x="79" y="141" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8.5" fill="#b45309">AsyncIOScheduler</text>
+  <rect x="28" y="150" width="102" height="14" rx="3" fill="#fde68a"/>
+  <text x="79" y="161" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8" fill="#92400e" font-weight="600">0 9 * * *  (9am UTC)</text>
+
+  <!-- Arrow: APScheduler to Schedule Trigger Node -->
+  <line x1="144" y1="125" x2="183" y2="125" stroke="#d97706" stroke-width="1.5" marker-end="url(#arr-s)"/>
+  <text x="163" y="120" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="7.5" fill="#d97706">fires</text>
+
+  <!-- Schedule Trigger Node -->
+  <rect x="185" y="68" width="148" height="115" rx="10" fill="#fffbeb" stroke="#d97706" stroke-width="2"/>
+  <rect x="185" y="68" width="148" height="5" rx="3" fill="#d97706"/>
+  <text x="259" y="96" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="16">&#x1F4C5;</text>
+  <text x="259" y="112" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="11" font-weight="700" fill="#92400e">Schedule Trigger</text>
+  <text x="259" y="126" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8" fill="#b45309">canvas trigger node</text>
+  <rect x="197" y="136" width="124" height="38" rx="4" fill="#fde68a"/>
+  <text x="259" y="150" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="7.5" fill="#92400e">registered in</text>
+  <text x="259" y="162" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="7.5" fill="#92400e">workflow_triggers table</text>
+  <text x="259" y="174" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="7.5" fill="#92400e">on canvas save</text>
+
+  <!-- Arrow: Schedule Trigger to Researcher -->
+  <line x1="333" y1="125" x2="375" y2="125" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="354" y="118" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="7.5" fill="#94a3b8">trigger</text>
+
+  <!-- Researcher agent -->
+  <rect x="377" y="75" width="148" height="100" rx="10" fill="#eef2ff" stroke="#6366f1" stroke-width="2"/>
+  <rect x="377" y="75" width="148" height="5" rx="3" fill="#6366f1"/>
+  <text x="451" y="101" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="12" font-weight="700" fill="#4338ca">&#x1F50D; Researcher</text>
+  <text x="451" y="117" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8.5" fill="#818cf8">runs with a system-defined</text>
+  <text x="451" y="129" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8.5" fill="#818cf8">or workflow-default prompt</text>
+  <rect x="389" y="140" width="62" height="16" rx="3" fill="#c7d2fe"/>
+  <text x="420" y="152" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="7.5" fill="#3730a3">web_search</text>
+  <rect x="459" y="140" width="55" height="16" rx="3" fill="#c7d2fe"/>
+  <text x="486" y="152" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="7.5" fill="#3730a3">calculator</text>
+
+  <!-- Arrow: Researcher to Writer -->
+  <line x1="525" y1="125" x2="557" y2="125" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Writer agent -->
+  <rect x="559" y="75" width="148" height="100" rx="10" fill="#eef2ff" stroke="#6366f1" stroke-width="2"/>
+  <rect x="559" y="75" width="148" height="5" rx="3" fill="#6366f1"/>
+  <text x="633" y="101" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="12" font-weight="700" fill="#4338ca">&#x270D;&#xFE0F; Writer</text>
+  <text x="633" y="117" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8.5" fill="#818cf8">generates structured</text>
+  <text x="633" y="129" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8.5" fill="#818cf8">daily report</text>
+  <rect x="583" y="140" width="100" height="16" rx="3" fill="#c7d2fe"/>
+  <text x="633" y="152" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="7.5" fill="#3730a3">file_write</text>
+
+  <!-- Arrow: Writer to Output -->
+  <line x1="707" y1="125" x2="740" y2="125" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Output node -->
+  <rect x="742" y="85" width="122" height="80" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="803" y="110" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="11" font-weight="600" fill="#15803d">Output</text>
+  <text x="803" y="126" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8.5" fill="#16a34a">stored in DB</text>
+  <text x="803" y="140" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8.5" fill="#16a34a">Telegram (optional)</text>
+  <text x="803" y="154" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8.5" fill="#16a34a">Webhook (optional)</text>
+
+  <!-- DB box (bottom) -->
+  <rect x="177" y="200" width="164" height="32" rx="6" fill="#fafafa" stroke="#fcd34d" stroke-width="1"/>
+  <text x="259" y="214" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8" fill="#92400e" font-weight="600">workflow_triggers (DB)</text>
+  <text x="259" y="226" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="7.5" fill="#94a3b8">re-synced on backend boot</text>
+
+  <!-- Arrow from DB to APScheduler (feedback, dashed) -->
+  <path d="M 177,216 C 140,216 100,190 79,170" stroke="#d97706" stroke-width="1" fill="none" stroke-dasharray="3,2" marker-end="url(#arr-s)"/>
+  <text x="118" y="210" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="7.5" fill="#d97706" transform="rotate(-12 118 210)">registers job</text>
+
+  <!-- Caption -->
+  <text x="440" y="242" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="9.5" fill="#94a3b8" font-style="italic">Scheduled Workflow -- Cron saved in canvas -- workflow_triggers table -- APScheduler job -- LangGraph execution at trigger time</text>
+</svg>

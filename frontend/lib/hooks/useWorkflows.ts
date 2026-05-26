@@ -11,6 +11,7 @@ async function fetchWorkflows() {
 
 export function useWorkflows() {
   const setWorkflows = useWorkflowStore((s) => s.setWorkflows);
+  const remove = useWorkflowStore((s) => s.remove);
   const { data, error, isLoading, mutate } = useSWR("/workflows", fetchWorkflows, {
     refreshInterval: 30_000,
   });
@@ -19,5 +20,5 @@ export function useWorkflows() {
     if (data) setWorkflows(data);
   }, [data, setWorkflows]);
 
-  return { workflows: data ?? [], error, isLoading, mutate };
+  return { workflows: data ?? [], error, isLoading, mutate, remove };
 }

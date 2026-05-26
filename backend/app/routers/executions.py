@@ -114,11 +114,12 @@ async def get_execution_messages(execution_id: UUID, db: AsyncSession = Depends(
         {
             "id": str(m.id),
             "execution_id": str(m.execution_id),
-            "agent_id": str(m.agent_id) if m.agent_id else None,
+            "from_agent": m.from_agent,
+            "to_agent": m.to_agent,
             "message_type": m.message_type,
             "channel": m.channel,
             "content": m.content,
-            "token_count": m.token_count,
+            "tokens_used": m.tokens_used,
             "created_at": m.created_at.isoformat() if m.created_at else None,
         }
         for m in messages

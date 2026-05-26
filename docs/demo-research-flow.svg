@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 210" width="800" height="210" role="img" aria-label="Research Report Pipeline workflow diagram">
+  <title>Research Report Pipeline</title>
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L10 5L0 10z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="210" rx="12" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- ── Input node ─────────────────────────────────────────────── -->
+  <rect x="15" y="70" width="110" height="60" rx="8" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="70" y="97" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="12" font-weight="600" fill="#475569">Input</text>
+  <text x="70" y="114" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#94a3b8">user query</text>
+
+  <!-- Arrow: Input → Researcher -->
+  <line x1="125" y1="100" x2="177" y2="100" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- ── Researcher agent node ──────────────────────────────────── -->
+  <rect x="179" y="42" width="192" height="116" rx="10" fill="#eef2ff" stroke="#6366f1" stroke-width="2"/>
+  <!-- top accent bar -->
+  <rect x="179" y="42" width="192" height="5" rx="3" fill="#6366f1"/>
+  <text x="275" y="74" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="13" font-weight="700" fill="#4338ca">🔍 Researcher</text>
+  <text x="275" y="91" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#818cf8">Senior Research Analyst</text>
+  <!-- tool badges -->
+  <rect x="194" y="103" width="74" height="19" rx="4" fill="#c7d2fe"/>
+  <text x="231" y="117" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8.5" fill="#3730a3">web_search</text>
+  <rect x="276" y="103" width="72" height="19" rx="4" fill="#c7d2fe"/>
+  <text x="312" y="117" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8.5" fill="#3730a3">calculator</text>
+  <!-- ReAct label -->
+  <text x="275" y="149" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="7.5" fill="#a5b4fc" font-style="italic">ReAct loop · max_iter configurable</text>
+
+  <!-- Arrow: Researcher → Writer -->
+  <line x1="371" y1="100" x2="423" y2="100" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- ── Writer agent node ──────────────────────────────────────── -->
+  <rect x="425" y="42" width="192" height="116" rx="10" fill="#eef2ff" stroke="#6366f1" stroke-width="2"/>
+  <rect x="425" y="42" width="192" height="5" rx="3" fill="#6366f1"/>
+  <text x="521" y="74" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="13" font-weight="700" fill="#4338ca">✍️ Writer</text>
+  <text x="521" y="91" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#818cf8">Professional Content Writer</text>
+  <rect x="471" y="103" width="100" height="19" rx="4" fill="#c7d2fe"/>
+  <text x="521" y="117" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8.5" fill="#3730a3">file_write</text>
+  <text x="521" y="149" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="7.5" fill="#a5b4fc" font-style="italic">receives Researcher output via state</text>
+
+  <!-- Arrow: Writer → Output -->
+  <line x1="617" y1="100" x2="659" y2="100" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- ── Output node ────────────────────────────────────────────── -->
+  <rect x="661" y="70" width="122" height="60" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="722" y="97" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="12" font-weight="600" fill="#15803d">Output</text>
+  <text x="722" y="114" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#86efac">Final Report</text>
+
+  <!-- Caption -->
+  <text x="400" y="193" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="10" fill="#94a3b8" font-style="italic">Research Report Pipeline · LangGraph sequential StateGraph · 2 agent nodes · graph.astream_events(version="v2")</text>
+</svg>

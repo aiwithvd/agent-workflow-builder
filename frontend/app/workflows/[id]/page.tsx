@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { type Node } from "@xyflow/react";
 import { WorkflowCanvas } from "@/components/workflow/WorkflowCanvas";
 import { Button } from "@/components/ui/Button";
@@ -694,6 +694,7 @@ function NodeConfigPanel({
 export default function WorkflowDetailPage() {
   const params = useParams();
   const id = params.id as string;
+  const router = useRouter();
   const { agents } = useAgents();
   const { nodes, edges, setNodes, setEdges } = useWorkflowStore();
   const { upsert } = useAgentStore();
@@ -702,6 +703,15 @@ export default function WorkflowDetailPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [running, setRunning] = useState(false);
+
+  // Rename state
+  const [editingName, setEditingName] = useState(false);
+  const [nameValue, setNameValue] = useState("");
+  const nameInputRef = useRef<HTMLInputElement>(null);
+
+  // Delete confirmation
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   // Node config panel
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
@@ -825,6 +835,34 @@ export default function WorkflowDetailPage() {
     setSelectedNode(null);
   }
 
+  // When workflow loads, seed nameValue
+  useEffect(() => {
+    if (workflow) setNameValue(workflow.name ?? "");
+  }, [workflow]);
+
+  // Focus the rename input when editing starts
+  useEffect(() => {
+    if (editingName) nameInputRef.current?.select();
+  }, [editingName]);
+
+  async function handleRenameSave() {
+    const trimmed = nameValue.trim();
+    if (!trimmed || trimmed === workflow?.name) {
+      setEditingName(false);
+      return;
+    }
+    const res = await workflowsAPI.update(id, { name: trimmed });
+    if (!res.error) setWorkflow((w: any) => ({ ...w, name: trimmed }));
+    setEditingName(false);
+  }
+
+  async function handleDelete() {
+    setDeleting(true);
+    const res = await workflowsAPI.delete(id);
+    setDeleting(false);
+    if (!res.error) router.push("/workflows");
+  }
+
   async function handleSave() {
     setSaving(true);
     await workflowsAPI.update(id, { nodes, edges });
@@ -890,14 +928,30 @@ export default function WorkflowDetailPage() {
         >
           ← Back
         </Link>
-        <div>
-          <h1 className="font-semibold text-slate-900 dark:text-slate-100">
-            {workflow?.name}
-          </h1>
-          {workflow?.description && (
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              {workflow.description}
-            </p>
+        <div className="flex items-center gap-2">
+          {editingName ? (
+            <input
+              ref={nameInputRef}
+              value={nameValue}
+              onChange={(e) => setNameValue(e.target.value)}
+              onBlur={handleRenameSave}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleRenameSave();
+                if (e.key === "Escape") setEditingName(false);
+              }}
+              className="font-semibold text-slate-900 dark:text-slate-100 bg-white dark:bg-slate-800 border border-indigo-400 dark:border-indigo-500 rounded px-2 py-0.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 min-w-[160px]"
+            />
+          ) : (
+            <button
+              onClick={() => setEditingName(true)}
+              title="Click to rename"
+              className="group flex items-center gap-1.5"
+            >
+              <h1 className="font-semibold text-slate-900 dark:text-slate-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                {workflow?.name}
+              </h1>
+              <span className="text-slate-300 dark:text-slate-600 group-hover:text-indigo-400 text-xs transition-colors">✏</span>
+            </button>
           )}
         </div>
 
@@ -912,6 +966,14 @@ export default function WorkflowDetailPage() {
         )}
 
         <div className="ml-auto flex gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowDeleteConfirm(true)}
+            className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-950/20"
+          >
+            🗑 Delete
+          </Button>
           <Button variant="secondary" size="sm" loading={saving} onClick={handleSave}>
             Save
           </Button>
@@ -1006,6 +1068,34 @@ export default function WorkflowDetailPage() {
           />
         )}
       </div>
+
+      {/* Delete confirmation modal */}
+      <Modal
+        open={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        title="Delete Workflow"
+        size="sm"
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setShowDeleteConfirm(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleDelete}
+              loading={deleting}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              Delete
+            </Button>
+          </>
+        }
+      >
+        <p className="text-sm text-slate-600 dark:text-slate-400">
+          Are you sure you want to delete{" "}
+          <strong className="text-slate-900 dark:text-slate-100">{workflow?.name}</strong>?
+          This will also remove all associated triggers and cannot be undone.
+        </p>
+      </Modal>
 
       {/* Run input modal */}
       <Modal

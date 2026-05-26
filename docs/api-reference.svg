@@ -1,0 +1,172 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 345" width="920" height="345" role="img" aria-label="REST API Reference">
+  <title>REST API Reference</title>
+
+  <!-- Background -->
+  <rect width="920" height="345" rx="12" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- Title -->
+  <text x="460" y="30" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="14" font-weight="700" fill="#1e293b">REST API Reference</text>
+  <text x="460" y="46" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="9" fill="#94a3b8">All endpoints share base path /api/v1  --  Full OpenAPI docs at /docs</text>
+
+  <!-- COLUMN 1 - AGENTS -->
+  <rect x="14" y="55" width="215" height="264" rx="7" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+  <rect x="14" y="55" width="215" height="36" rx="7" fill="#6366f1"/>
+  <rect x="14" y="74" width="215" height="17" fill="#6366f1"/>
+  <text x="121" y="78" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="12" font-weight="700" fill="white">Agents</text>
+  <text x="121" y="91" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8" fill="#c7d2fe">/api/v1/agents</text>
+
+  <rect x="22" y="99" width="42" height="16" rx="3" fill="#dcfce7"/>
+  <text x="43" y="111" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8" font-weight="700" fill="#15803d">GET</text>
+  <text x="70" y="111" font-family="Courier New,monospace" font-size="9" fill="#374151">/agents</text>
+  <line x1="14" y1="121" x2="229" y2="121" stroke="#f1f5f9" stroke-width="1"/>
+
+  <rect x="22" y="125" width="42" height="16" rx="3" fill="#dcfce7"/>
+  <text x="43" y="137" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8" font-weight="700" fill="#15803d">GET</text>
+  <text x="70" y="137" font-family="Courier New,monospace" font-size="9" fill="#374151">/agents/presets</text>
+  <line x1="14" y1="147" x2="229" y2="147" stroke="#f1f5f9" stroke-width="1"/>
+
+  <rect x="22" y="151" width="42" height="16" rx="3" fill="#dbeafe"/>
+  <text x="43" y="163" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8" font-weight="700" fill="#1d4ed8">POST</text>
+  <text x="70" y="163" font-family="Courier New,monospace" font-size="9" fill="#374151">/agents</text>
+  <line x1="14" y1="173" x2="229" y2="173" stroke="#f1f5f9" stroke-width="1"/>
+
+  <rect x="22" y="177" width="42" height="16" rx="3" fill="#dcfce7"/>
+  <text x="43" y="189" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8" font-weight="700" fill="#15803d">GET</text>
+  <text x="70" y="189" font-family="Courier New,monospace" font-size="9" fill="#374151">/agents/{id}</text>
+  <line x1="14" y1="199" x2="229" y2="199" stroke="#f1f5f9" stroke-width="1"/>
+
+  <rect x="22" y="203" width="42" height="16" rx="3" fill="#fef3c7"/>
+  <text x="43" y="215" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8" font-weight="700" fill="#92400e">PATCH</text>
+  <text x="70" y="215" font-family="Courier New,monospace" font-size="9" fill="#374151">/agents/{id}</text>
+  <line x1="14" y1="225" x2="229" y2="225" stroke="#f1f5f9" stroke-width="1"/>
+
+  <rect x="22" y="229" width="42" height="16" rx="3" fill="#fee2e2"/>
+  <text x="43" y="241" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8" font-weight="700" fill="#991b1b">DEL</text>
+  <text x="70" y="241" font-family="Courier New,monospace" font-size="9" fill="#374151">/agents/{id}</text>
+
+  <!-- COLUMN 2 - WORKFLOWS -->
+  <rect x="239" y="55" width="215" height="264" rx="7" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+  <rect x="239" y="55" width="215" height="36" rx="7" fill="#3b82f6"/>
+  <rect x="239" y="74" width="215" height="17" fill="#3b82f6"/>
+  <text x="346" y="78" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="12" font-weight="700" fill="white">Workflows</text>
+  <text x="346" y="91" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8" fill="#bfdbfe">/api/v1/workflows</text>
+
+  <rect x="247" y="99" width="42" height="16" rx="3" fill="#dcfce7"/>
+  <text x="268" y="111" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8" font-weight="700" fill="#15803d">GET</text>
+  <text x="295" y="111" font-family="Courier New,monospace" font-size="9" fill="#374151">/workflows</text>
+  <line x1="239" y1="121" x2="454" y2="121" stroke="#f1f5f9" stroke-width="1"/>
+
+  <rect x="247" y="125" width="42" height="16" rx="3" fill="#dbeafe"/>
+  <text x="268" y="137" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8" font-weight="700" fill="#1d4ed8">POST</text>
+  <text x="295" y="137" font-family="Courier New,monospace" font-size="9" fill="#374151">/workflows</text>
+  <line x1="239" y1="147" x2="454" y2="147" stroke="#f1f5f9" stroke-width="1"/>
+
+  <rect x="247" y="151" width="42" height="16" rx="3" fill="#dcfce7"/>
+  <text x="268" y="163" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8" font-weight="700" fill="#15803d">GET</text>
+  <text x="295" y="163" font-family="Courier New,monospace" font-size="9" fill="#374151">/workflows/templates</text>
+  <line x1="239" y1="173" x2="454" y2="173" stroke="#f1f5f9" stroke-width="1"/>
+
+  <rect x="247" y="177" width="42" height="16" rx="3" fill="#dcfce7"/>
+  <text x="268" y="189" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8" font-weight="700" fill="#15803d">GET</text>
+  <text x="295" y="189" font-family="Courier New,monospace" font-size="9" fill="#374151">/workflows/{id}</text>
+  <line x1="239" y1="199" x2="454" y2="199" stroke="#f1f5f9" stroke-width="1"/>
+
+  <rect x="247" y="203" width="42" height="16" rx="3" fill="#fef3c7"/>
+  <text x="268" y="215" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8" font-weight="700" fill="#92400e">PATCH</text>
+  <text x="295" y="215" font-family="Courier New,monospace" font-size="9" fill="#374151">/workflows/{id}</text>
+  <line x1="239" y1="225" x2="454" y2="225" stroke="#f1f5f9" stroke-width="1"/>
+
+  <rect x="247" y="229" width="42" height="16" rx="3" fill="#fee2e2"/>
+  <text x="268" y="241" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8" font-weight="700" fill="#991b1b">DEL</text>
+  <text x="295" y="241" font-family="Courier New,monospace" font-size="9" fill="#374151">/workflows/{id}</text>
+
+  <!-- COLUMN 3 - EXECUTIONS -->
+  <rect x="464" y="55" width="215" height="264" rx="7" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+  <rect x="464" y="55" width="215" height="36" rx="7" fill="#8b5cf6"/>
+  <rect x="464" y="74" width="215" height="17" fill="#8b5cf6"/>
+  <text x="571" y="78" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="12" font-weight="700" fill="white">Executions</text>
+  <text x="571" y="91" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8" fill="#ddd6fe">/api/v1/executions</text>
+
+  <rect x="472" y="99" width="42" height="16" rx="3" fill="#dbeafe"/>
+  <text x="493" y="111" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8" font-weight="700" fill="#1d4ed8">POST</text>
+  <text x="520" y="111" font-family="Courier New,monospace" font-size="9" fill="#374151">/executions</text>
+  <line x1="464" y1="121" x2="679" y2="121" stroke="#f1f5f9" stroke-width="1"/>
+
+  <rect x="472" y="125" width="42" height="16" rx="3" fill="#dcfce7"/>
+  <text x="493" y="137" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8" font-weight="700" fill="#15803d">GET</text>
+  <text x="520" y="137" font-family="Courier New,monospace" font-size="9" fill="#374151">/executions</text>
+  <line x1="464" y1="147" x2="679" y2="147" stroke="#f1f5f9" stroke-width="1"/>
+
+  <rect x="472" y="151" width="42" height="16" rx="3" fill="#dcfce7"/>
+  <text x="493" y="163" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8" font-weight="700" fill="#15803d">GET</text>
+  <text x="520" y="163" font-family="Courier New,monospace" font-size="9" fill="#374151">/executions/{id}</text>
+  <line x1="464" y1="173" x2="679" y2="173" stroke="#f1f5f9" stroke-width="1"/>
+
+  <rect x="472" y="177" width="42" height="16" rx="3" fill="#dcfce7"/>
+  <text x="493" y="189" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8" font-weight="700" fill="#15803d">GET</text>
+  <text x="520" y="189" font-family="Courier New,monospace" font-size="9" fill="#374151">/{id}/messages</text>
+  <line x1="464" y1="199" x2="679" y2="199" stroke="#f1f5f9" stroke-width="1"/>
+
+  <rect x="472" y="203" width="42" height="16" rx="3" fill="#dcfce7"/>
+  <text x="493" y="215" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8" font-weight="700" fill="#15803d">GET</text>
+  <text x="520" y="215" font-family="Courier New,monospace" font-size="9" fill="#374151">/{id}/traces</text>
+  <line x1="464" y1="225" x2="679" y2="225" stroke="#f1f5f9" stroke-width="1"/>
+
+  <rect x="472" y="229" width="42" height="16" rx="3" fill="#dcfce7"/>
+  <text x="493" y="241" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8" font-weight="700" fill="#15803d">GET</text>
+  <text x="520" y="241" font-family="Courier New,monospace" font-size="9" fill="#374151">/{id}/metrics</text>
+  <line x1="464" y1="251" x2="679" y2="251" stroke="#f1f5f9" stroke-width="1"/>
+
+  <rect x="472" y="255" width="42" height="16" rx="3" fill="#f3e8ff"/>
+  <text x="493" y="267" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8" font-weight="700" fill="#6b21a8">WS</text>
+  <text x="520" y="267" font-family="Courier New,monospace" font-size="9" fill="#374151">/ws/monitor/{id}</text>
+
+  <!-- COLUMN 4 - SETTINGS -->
+  <rect x="689" y="55" width="217" height="264" rx="7" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+  <rect x="689" y="55" width="217" height="36" rx="7" fill="#475569"/>
+  <rect x="689" y="74" width="217" height="17" fill="#475569"/>
+  <text x="797" y="78" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="12" font-weight="700" fill="white">Settings</text>
+  <text x="797" y="91" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8" fill="#cbd5e1">/api/v1/settings</text>
+
+  <rect x="697" y="99" width="42" height="16" rx="3" fill="#dcfce7"/>
+  <text x="718" y="111" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8" font-weight="700" fill="#15803d">GET</text>
+  <text x="745" y="111" font-family="Courier New,monospace" font-size="9" fill="#374151">/settings</text>
+  <line x1="689" y1="121" x2="906" y2="121" stroke="#f1f5f9" stroke-width="1"/>
+
+  <rect x="697" y="125" width="42" height="16" rx="3" fill="#fef3c7"/>
+  <text x="718" y="137" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8" font-weight="700" fill="#92400e">PATCH</text>
+  <text x="745" y="137" font-family="Courier New,monospace" font-size="9" fill="#374151">/settings</text>
+  <line x1="689" y1="147" x2="906" y2="147" stroke="#f1f5f9" stroke-width="1"/>
+
+  <rect x="697" y="151" width="42" height="16" rx="3" fill="#dcfce7"/>
+  <text x="718" y="163" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8" font-weight="700" fill="#15803d">GET</text>
+  <text x="745" y="163" font-family="Courier New,monospace" font-size="9" fill="#374151">/{key}/raw</text>
+  <line x1="689" y1="173" x2="906" y2="173" stroke="#f1f5f9" stroke-width="1"/>
+
+  <!-- Secrets note -->
+  <rect x="697" y="183" width="200" height="32" rx="5" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="797" y="197" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8" fill="#64748b">Sensitive values returned as</text>
+  <text x="797" y="209" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8" fill="#64748b">*** via API -- settable in UI</text>
+
+  <!-- Legend -->
+  <rect x="697" y="230" width="200" height="72" rx="5" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="797" y="246" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8" font-weight="700" fill="#374151">METHOD KEY</text>
+  <rect x="707" y="252" width="32" height="13" rx="2" fill="#dcfce7"/>
+  <text x="723" y="263" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="7.5" font-weight="700" fill="#15803d">GET</text>
+  <text x="745" y="263" font-family="system-ui,-apple-system,sans-serif" font-size="8" fill="#475569">read</text>
+  <rect x="707" y="268" width="32" height="13" rx="2" fill="#dbeafe"/>
+  <text x="723" y="279" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="7.5" font-weight="700" fill="#1d4ed8">POST</text>
+  <text x="745" y="279" font-family="system-ui,-apple-system,sans-serif" font-size="8" fill="#475569">create</text>
+  <rect x="800" y="252" width="38" height="13" rx="2" fill="#fef3c7"/>
+  <text x="819" y="263" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="7.5" font-weight="700" fill="#92400e">PATCH</text>
+  <text x="844" y="263" font-family="system-ui,-apple-system,sans-serif" font-size="8" fill="#475569">update</text>
+  <rect x="800" y="268" width="32" height="13" rx="2" fill="#fee2e2"/>
+  <text x="816" y="279" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="7.5" font-weight="700" fill="#991b1b">DEL</text>
+  <text x="839" y="279" font-family="system-ui,-apple-system,sans-serif" font-size="8" fill="#475569">delete</text>
+  <rect x="707" y="284" width="30" height="13" rx="2" fill="#f3e8ff"/>
+  <text x="722" y="295" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="7.5" font-weight="700" fill="#6b21a8">WS</text>
+  <text x="745" y="295" font-family="system-ui,-apple-system,sans-serif" font-size="8" fill="#475569">WebSocket stream</text>
+
+  <!-- Caption -->
+  <text x="460" y="330" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="9.5" fill="#94a3b8" font-style="italic">Full interactive docs at /docs (Swagger UI)  --  All endpoints return JSON  --  Auth: none required for local deployment</text>
+</svg>

@@ -50,3 +50,7 @@ dump.rdb
 
 # Files
 backend/files/
+
+
+# Langgraph_api
+backend/.langgraph_api

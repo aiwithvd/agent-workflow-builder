@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 260" width="880" height="260" role="img" aria-label="Telegram Integration workflow diagram">
+  <title>Telegram Integration</title>
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L10 5L0 10z" fill="#94a3b8"/>
+    </marker>
+    <marker id="arr-t" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0L10 5L0 10z" fill="#0ea5e9"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="880" height="260" rx="12" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- Telegram User (far left) -->
+  <rect x="14" y="90" width="110" height="80" rx="8" fill="#f0f9ff" stroke="#0ea5e9" stroke-width="1.5"/>
+  <text x="69" y="122" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="20">&#x1F464;</text>
+  <text x="69" y="140" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="10" font-weight="600" fill="#0369a1">Telegram</text>
+  <text x="69" y="154" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="10" font-weight="600" fill="#0369a1">User</text>
+  <text x="69" y="168" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8" fill="#7dd3fc">"Research X..."</text>
+
+  <!-- Arrow: User to Telegram Bot (dashed) -->
+  <line x1="124" y1="130" x2="174" y2="130" stroke="#0ea5e9" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#arr-t)"/>
+  <text x="149" y="125" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="7.5" fill="#0ea5e9">message</text>
+
+  <!-- Telegram Trigger Node -->
+  <rect x="176" y="75" width="140" height="110" rx="10" fill="#e0f2fe" stroke="#0ea5e9" stroke-width="2"/>
+  <rect x="176" y="75" width="140" height="5" rx="3" fill="#0ea5e9"/>
+  <text x="246" y="103" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="16">&#x2708;&#xFE0F;</text>
+  <text x="246" y="120" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="11" font-weight="700" fill="#0369a1">Telegram Trigger</text>
+  <text x="246" y="135" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8" fill="#0284c7">canvas trigger node</text>
+  <rect x="188" y="144" width="116" height="28" rx="4" fill="#bae6fd"/>
+  <text x="246" y="155" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="7.5" fill="#0c4a6e">ChannelRouter looks up</text>
+  <text x="246" y="166" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="7.5" fill="#0c4a6e">active trigger in DB</text>
+
+  <!-- Arrow: Trigger to Researcher -->
+  <line x1="316" y1="130" x2="366" y2="130" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Researcher agent -->
+  <rect x="368" y="60" width="148" height="80" rx="10" fill="#eef2ff" stroke="#6366f1" stroke-width="2"/>
+  <rect x="368" y="60" width="148" height="5" rx="3" fill="#6366f1"/>
+  <text x="442" y="86" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="12" font-weight="700" fill="#4338ca">&#x1F50D; Researcher</text>
+  <text x="442" y="101" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8.5" fill="#818cf8">executes ReAct loop</text>
+  <rect x="380" y="112" width="62" height="16" rx="3" fill="#c7d2fe"/>
+  <text x="411" y="124" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="7.5" fill="#3730a3">web_search</text>
+  <rect x="450" y="112" width="55" height="16" rx="3" fill="#c7d2fe"/>
+  <text x="477" y="124" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="7.5" fill="#3730a3">calculator</text>
+
+  <!-- Arrow: Researcher to Writer -->
+  <line x1="516" y1="100" x2="556" y2="100" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Writer agent -->
+  <rect x="558" y="60" width="148" height="80" rx="10" fill="#eef2ff" stroke="#6366f1" stroke-width="2"/>
+  <rect x="558" y="60" width="148" height="5" rx="3" fill="#6366f1"/>
+  <text x="632" y="86" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="12" font-weight="700" fill="#4338ca">&#x270D;&#xFE0F; Writer</text>
+  <text x="632" y="101" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8.5" fill="#818cf8">generates final output</text>
+  <rect x="582" y="112" width="100" height="16" rx="3" fill="#c7d2fe"/>
+  <text x="632" y="124" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="7.5" fill="#3730a3">file_write</text>
+
+  <!-- Arrow: Writer to Output node -->
+  <line x1="706" y1="100" x2="740" y2="100" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Output node with Telegram delivery -->
+  <rect x="742" y="68" width="122" height="110" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="803" y="92" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="11" font-weight="600" fill="#15803d">Output</text>
+  <text x="803" y="107" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8.5" fill="#16a34a">result persisted</text>
+  <text x="803" y="120" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8.5" fill="#16a34a">to PostgreSQL</text>
+  <rect x="756" y="130" width="93" height="34" rx="5" fill="#e0f2fe" stroke="#0ea5e9" stroke-width="1"/>
+  <text x="803" y="145" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8" font-weight="700" fill="#0369a1">&#x2708;&#xFE0F; Telegram reply</text>
+  <text x="803" y="158" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="7.5" fill="#0284c7">sent to user chat</text>
+
+  <!-- Return arrow: Output to User (bottom path) -->
+  <path d="M 803,178 C 803,215 69,215 69,170" stroke="#0ea5e9" stroke-width="1.5" fill="none" stroke-dasharray="4,2" marker-end="url(#arr-t)"/>
+  <text x="436" y="228" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8" fill="#0ea5e9">bot sends reply via Telegram Bot API</text>
+
+  <!-- DB badge -->
+  <rect x="340" y="185" width="200" height="38" rx="6" fill="#fafafa" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="440" y="201" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8.5" fill="#475569" font-weight="600">workflow_triggers table</text>
+  <text x="440" y="216" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="8" fill="#94a3b8">maps chat_id to workflow -- persists across restarts</text>
+
+  <!-- Caption -->
+  <text x="440" y="248" text-anchor="middle" font-family="system-ui,-apple-system,sans-serif" font-size="9.5" fill="#94a3b8" font-style="italic">Telegram Integration -- ChannelRouter -- ExecutionService -- async LangGraph graph -- bot reply -- message persisted in DB</text>
+</svg>

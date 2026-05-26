@@ -1,15 +1,34 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useMemo } from "react";
 import { AgentForm } from "@/components/agents/AgentForm";
 import { Card, CardBody, CardHeader } from "@/components/ui/Card";
 import { agentsAPI } from "@/lib/api";
 import { useAgentStore } from "@/lib/stores/agentStore";
 import Link from "next/link";
 
+function decodePreset(encoded: string | null): Record<string, any> | undefined {
+  if (!encoded) return undefined;
+  try {
+    return JSON.parse(atob(decodeURIComponent(encoded)));
+  } catch {
+    return undefined;
+  }
+}
+
 export default function NewAgentPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const upsert = useAgentStore((s) => s.upsert);
+
+  // Decode preset from URL param (set by AgentPresetPicker)
+  const preset = useMemo(
+    () => decodePreset(searchParams.get("preset")),
+    [searchParams]
+  );
+
+  const isFromPreset = !!preset;
 
   async function handleSubmit(data: any) {
     const res = await agentsAPI.create(data);
@@ -31,17 +50,32 @@ export default function NewAgentPage() {
           ← Back to agents
         </Link>
         <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-          Create Agent
+          {isFromPreset ? (
+            <>
+              <span className="mr-2">{preset?.icon}</span>
+              {preset?.name} Agent
+            </>
+          ) : (
+            "Create Agent"
+          )}
         </h1>
+        {isFromPreset && (
+          <p className="text-sm text-indigo-600 dark:text-indigo-400 mt-1">
+            Pre-filled from the <strong>{preset?.name}</strong> preset — customise as needed.
+          </p>
+        )}
       </div>
       <Card>
         <CardHeader>
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            Configure a new AI agent with a provider, model, and tools.
+            {isFromPreset
+              ? "Review and adjust the preset configuration, then save to create your agent."
+              : "Configure a new AI agent with a provider, model, and tools."}
           </p>
         </CardHeader>
         <CardBody>
           <AgentForm
+            initial={preset}
             onSubmit={handleSubmit}
             onCancel={() => router.push("/agents")}
             submitLabel="Create Agent"

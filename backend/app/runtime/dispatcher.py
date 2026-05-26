@@ -296,6 +296,9 @@ async def make_graph(config: dict) -> CompiledGraph:
 
         # psycopg3 needs "postgresql://..." not SQLAlchemy's "postgresql+asyncpg://..."
         pg_url = settings.database_url.replace("postgresql+asyncpg://", "postgresql://")
+        # Add timeout options so Supabase/Postgres statement_timeout doesn't kill DDL
+        separator = "&" if "?" in pg_url else "?"
+        pg_url = f"{pg_url}{separator}options=-c%20statement_timeout%3D300000&connect_timeout=10"
         checkpointer = AsyncPostgresSaver.from_conn_string(pg_url)
         await checkpointer.setup()
         logger.info(
@@ -303,7 +306,7 @@ async def make_graph(config: dict) -> CompiledGraph:
             workflow_id, cfg.get("thread_id", "<none>"),
         )
     except Exception as exc:
-        logger.warning(
+        logger.error(
             "Checkpointer unavailable for workflow %s — proceeding without "
             "persistent memory: %s",
             workflow_id, exc,

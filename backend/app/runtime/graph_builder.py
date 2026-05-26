@@ -123,6 +123,10 @@ def build_graph_from_definition(
             llm = create_llm(
                 agent_cfg.get("provider", LLMProvider.OLLAMA),
                 agent_cfg.get("model", "llama3.2"),
+                temperature=agent_cfg.get("temperature"),
+                top_p=agent_cfg.get("top_p"),
+                presence_penalty=agent_cfg.get("presence_penalty"),
+                frequency_penalty=agent_cfg.get("frequency_penalty"),
             )
         except Exception as e:
             raise ValueError(f"Cannot create LLM for node '{node_id}': {e}") from e
@@ -145,7 +149,7 @@ def build_graph_from_definition(
         built_agents[node_id] = agent
 
         # Closure captures node_id correctly
-        def make_node_fn(nid: str):
+        def make_node_fn(nid: str, cfg: dict):
             def process_node(state: dict) -> dict:
                 ag = built_agents[nid]
                 messages = state.get("messages", [])
@@ -155,13 +159,26 @@ def build_graph_from_definition(
                     state["current_agent"] = nid
                     state["last_output"] = result.get("output", "")
                 except Exception as e:
-                    logger.error("Node %s failed: %s", nid, e)
+                    error_str = str(e)
+                    if "<html" in error_str.lower():
+                        error_str = (
+                            f"[LLM endpoint returned HTTP error — likely wrong base_url or model name] "
+                            f"{error_str[:400]}"
+                        )
+                    logger.error(
+                        "Node %s failed. provider=%s model=%s tools=%s | Error: %s",
+                        nid,
+                        cfg.get("provider"),
+                        cfg.get("model"),
+                        cfg.get("tools", []),
+                        error_str,
+                    )
                     state["error"] = str(e)
                     state["current_agent"] = nid
                 return state
             return process_node
 
-        graph.add_node(node_id, make_node_fn(node_id))
+        graph.add_node(node_id, make_node_fn(node_id, agent_cfg))
 
     if not built_agents:
         raise ValueError("No agents could be built — check agent configurations and LLM providers")

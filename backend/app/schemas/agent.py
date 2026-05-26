@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 from app.enums import LLMProvider, AgentTool, MessageChannel
 
@@ -24,6 +24,12 @@ class AgentCreate(BaseModel):
     memory_enabled: bool = False
     guardrails: GuardrailConfig | None = None
     schedule: str | None = None
+    # LLM generation parameters
+    temperature: float | None = Field(default=None, ge=0.0, le=2.0)
+    top_p: float | None = Field(default=None, ge=0.0, le=1.0)
+    presence_penalty: float | None = Field(default=None, ge=-2.0, le=2.0)
+    frequency_penalty: float | None = Field(default=None, ge=-2.0, le=2.0)
+    max_iterations: int | None = Field(default=None, ge=1, le=50)
 
 
 class AgentUpdate(BaseModel):
@@ -38,6 +44,12 @@ class AgentUpdate(BaseModel):
     memory_enabled: bool | None = None
     guardrails: GuardrailConfig | None = None
     schedule: str | None = None
+    # LLM generation parameters
+    temperature: float | None = Field(default=None, ge=0.0, le=2.0)
+    top_p: float | None = Field(default=None, ge=0.0, le=1.0)
+    presence_penalty: float | None = Field(default=None, ge=-2.0, le=2.0)
+    frequency_penalty: float | None = Field(default=None, ge=-2.0, le=2.0)
+    max_iterations: int | None = Field(default=None, ge=1, le=50)
 
 
 class AgentRead(BaseModel):
@@ -53,6 +65,11 @@ class AgentRead(BaseModel):
     memory_enabled: bool
     guardrails: GuardrailConfig | None
     schedule: str | None
+    temperature: float | None
+    top_p: float | None
+    presence_penalty: float | None
+    frequency_penalty: float | None
+    max_iterations: int | None
     created_at: datetime
     updated_at: datetime
 
