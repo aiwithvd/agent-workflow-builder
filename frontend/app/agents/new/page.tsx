@@ -1,7 +1,7 @@
 "use client";
 
+import { Suspense, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useMemo } from "react";
 import { AgentForm } from "@/components/agents/AgentForm";
 import { Card, CardBody, CardHeader } from "@/components/ui/Card";
 import { agentsAPI } from "@/lib/api";
@@ -17,7 +17,7 @@ function decodePreset(encoded: string | null): Record<string, any> | undefined {
   }
 }
 
-export default function NewAgentPage() {
+function NewAgentContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const upsert = useAgentStore((s) => s.upsert);
@@ -83,5 +83,13 @@ export default function NewAgentPage() {
         </CardBody>
       </Card>
     </div>
+  );
+}
+
+export default function NewAgentPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center h-screen text-slate-500">Loading…</div>}>
+      <NewAgentContent />
+    </Suspense>
   );
 }

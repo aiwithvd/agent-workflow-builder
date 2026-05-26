@@ -70,6 +70,15 @@ Every technology choice below starts from the **problem it solves**, not from a 
 | **Tool integration** | `create_react_agent(llm, tools)` wraps any tool list into a ReAct loop — the tool registry is a simple string-to-function map |
 | **Async-native** | `graph.ainvoke()` and `graph.astream_events()` integrate without friction into FastAPI's async request handlers |
 
+**Why LangGraph and not alternatives:**
+
+| Option | Why rejected |
+|---|---|
+| **openclaw.ai** | openclaw.ai is a personal AI assistant platform (daemon + Control UI + CLI), not an embeddable runtime library. Its SOUL.md file-based configs describe a single always-on agent with skill plugins — there is no concept of multi-agent DAGs, conditional routing paths, or canvas topology binding. The Control UI manages conversations and skills, not graph-based workflows. Adopting openclaw would mean replacing the entire custom runtime, the React Flow canvas, and the PostgreSQL config model without gaining graph execution capabilities. |
+| **CrewAI** | Agents are a flat list with role/goal/backstory — no visual canvas, no conditional edges, no per-step streaming. A 3-agent sequential workflow requires manual `process` configuration, and routing decisions are hidden inside agent prompts rather than expressed as graph edges. |
+| **AutoGen** | Conversational agent loop — agents take turns responding in a chat. Cannot express a DAG, cannot conditionally route, cannot render per-node progress on a canvas. Designed for agent-to-agent debate, not ordered multi-step pipelines. |
+| **Semantic Kernel** | Provides a `KernelFunction` pipeline abstraction but no graph-based execution model. Functions are chained sequentially — no conditional branching, no visual topology mapping. Its C#-first design also adds friction to a Python + TypeScript codebase. |
+
 **How it's used in this codebase:**
 
 ```python
@@ -209,23 +218,23 @@ The Traces tab in the execution monitor fetches these traces from Langfuse's API
 
 Explicit comparison with the most common alternatives:
 
-| Capability | **This Platform** | CrewAI | AutoGen | n8n Agents |
-|---|---|---|---|---|
-| **Visual workflow builder** | ✅ React Flow canvas, drag-drop | ❌ Code only | ❌ Code only | ✅ (limited) |
-| **Conditional routing** | ✅ Labeled edges → LangGraph conditional edges | ⚠️ Role-based, no graph | ❌ Conversation-only | ⚠️ IF-node workaround |
-| **Per-step streaming** | ✅ WebSocket + node animation | ❌ | ❌ | ⚠️ Polling |
-| **Self-hosted observability** | ✅ Langfuse token/cost/latency | ❌ | ❌ | ❌ |
-| **Configurable dimensions/agent** | ✅ **25+** | ~8 | ~6 | ~12–15 |
-| **Agent presets / templates** | ✅ 8 presets + 2 workflow templates | ❌ | ❌ | ✅ |
-| **Telegram integration** | ✅ Webhook + ChannelRouter | ❌ | ❌ | ✅ (via node) |
-| **Scheduled execution** | ✅ APScheduler cron triggers | ❌ | ❌ | ✅ |
-| **Memory / checkpointing** | ✅ AsyncPostgresSaver | ⚠️ Custom | ⚠️ Custom | ❌ |
-| **Multi-provider LLM** | ✅ Ollama, OpenRouter, GLM-5.1 | ✅ | ✅ | ✅ |
-| **Runs 100% locally** | ✅ `docker compose up` | ⚠️ | ⚠️ | ✅ |
-| **TypeScript frontend** | ✅ Next.js 14 | ❌ | ❌ | ✅ |
-| **REST API for all operations** | ✅ Full CRUD + WebSocket | ❌ | ❌ | ✅ |
-| **Async agent-to-agent messages** | ✅ PostgreSQL messages table | ⚠️ | ⚠️ | ❌ |
-| **Token/cost tracking** | ✅ Per call, per execution | ❌ | ❌ | ❌ |
+| Capability | **This Platform** | **openclaw.ai** | CrewAI | AutoGen | n8n Agents |
+|---|---|---|---|---|---|---|
+| **Visual workflow builder** | ✅ React Flow canvas, drag-drop | ❌ Control UI is chat/skill management | ❌ Code only | ❌ Code only | ✅ (limited) |
+| **Conditional routing** | ✅ Labeled edges → LangGraph conditional edges | ❌ No graph execution model | ⚠️ Role-based, no graph | ❌ Conversation-only | ⚠️ IF-node workaround |
+| **Per-step streaming** | ✅ WebSocket + node animation | ❌ Single-agent, no per-node streaming | ❌ | ❌ | ⚠️ Polling |
+| **Self-hosted observability** | ✅ Langfuse token/cost/latency | ❌ No built-in observability | ❌ | ❌ | ❌ |
+| **Configurable dimensions/agent** | ✅ **25+** | ~5–8 (SOUL.md fields) | ~8 | ~6 | ~12–15 |
+| **Agent presets / templates** | ✅ 8 presets + 2 workflow templates | ❌ Not applicable | ❌ | ❌ | ✅ |
+| **Telegram integration** | ✅ Webhook + ChannelRouter | ✅ (via skill plugin) | ❌ | ❌ | ✅ (via node) |
+| **Scheduled execution** | ✅ APScheduler cron triggers | ✅ | ❌ | ❌ | ✅ |
+| **Memory / checkpointing** | ✅ AsyncPostgresSaver | ✅ Built-in memory | ⚠️ Custom | ⚠️ Custom | ❌ |
+| **Multi-provider LLM** | ✅ Ollama, OpenRouter, GLM-5.1 | ✅ | ✅ | ✅ | ✅ |
+| **Runs 100% locally** | ✅ `docker compose up` | ✅ | ⚠️ | ⚠️ | ✅ |
+| **TypeScript frontend** | ✅ Next.js 14 | ✅ | ❌ | ❌ | ✅ |
+| **REST API for all operations** | ✅ Full CRUD + WebSocket | ⚠️ Limited (platform API) | ❌ | ❌ | ✅ |
+| **Async agent-to-agent messages** | ✅ PostgreSQL messages table | ❌ Single-agent architecture | ⚠️ | ⚠️ | ❌ |
+| **Token/cost tracking** | ✅ Per call, per execution | ❌ Not built-in | ❌ | ❌ | ❌ |
 
 **Key differentiator:** This platform is the only option in this comparison that provides a visual graph builder, per-step streaming observability, self-hosted token/cost tracking, and 25+ agent configuration dimensions — all running locally with one command.
 
