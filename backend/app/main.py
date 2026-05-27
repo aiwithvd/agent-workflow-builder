@@ -15,8 +15,16 @@ from app.services.trigger_activator import activate_workflow_triggers
 
 logger = logging.getLogger(__name__)
 
-# Paths that bypass the secret check (public health + docs)
-_OPEN_PATHS = {"/health", "/", "/docs", "/openapi.json", "/redoc"}
+# Docs are only served in development — disabled entirely in production
+_is_dev = settings.environment == "development" or settings.debug
+_docs_url = "/docs" if _is_dev else None
+_redoc_url = "/redoc" if _is_dev else None
+_openapi_url = "/openapi.json" if _is_dev else None
+
+# Paths that bypass the secret check
+_OPEN_PATHS = {"/health", "/"}
+if _is_dev:
+    _OPEN_PATHS |= {"/docs", "/redoc", "/openapi.json"}
 
 
 class InternalSecretMiddleware(BaseHTTPMiddleware):
@@ -84,11 +92,15 @@ async def lifespan(app: FastAPI):
 
 
 # Create FastAPI app
+# Docs are disabled in production (ENVIRONMENT != "development" and DEBUG=False)
 app = FastAPI(
     title="Agent Orchestration Platform",
     description="Build, configure, and orchestrate AI agents",
     version="0.1.0",
     lifespan=lifespan,
+    docs_url=_docs_url,
+    redoc_url=_redoc_url,
+    openapi_url=_openapi_url,
 )
 
 # Security middlewares (outermost first — security headers wrap everything)
