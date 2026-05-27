@@ -5,6 +5,9 @@ class LLMProvider(StrEnum):
     """LLM provider options."""
     OLLAMA = "ollama"
     OPENROUTER = "openrouter"
+    OPENAI = "openai"
+    ANTHROPIC = "anthropic"
+    GOOGLE = "google"
     GLM51 = "glm51"  # Z.ai cloud API
     GLM51_LOCAL = "glm51-local"  # Local inference (vLLM/llama.cpp)
 

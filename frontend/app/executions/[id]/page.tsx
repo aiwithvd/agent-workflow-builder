@@ -10,7 +10,7 @@ import { Spinner } from "@/components/ui/Spinner";
 import { executionsAPI, createMonitorWebSocket } from "@/lib/api";
 import Link from "next/link";
 
-type Tab = "live" | "traces" | "messages";
+type Tab = "timeline" | "messages";
 
 const TERMINAL_STATUSES = new Set(["completed", "failed"]);
 
@@ -18,6 +18,22 @@ const TERMINAL_STATUSES = new Set(["completed", "failed"]);
 
 function MetricsBar({ metrics }: { metrics: any }) {
   if (!metrics) return null;
+
+  const hasData = metrics.total_tokens > 0 || metrics.trace_count > 0;
+  if (!hasData) {
+    return (
+      <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 px-4 py-3 text-center">
+        <p className="text-xs text-slate-500 dark:text-slate-400">
+          Token metrics unavailable.{" "}
+          <a href="/settings" className="text-indigo-500 hover:underline">
+            Configure Langfuse in Settings
+          </a>{" "}
+          to enable token tracking and cost estimation.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-4 gap-3">
       {[
@@ -49,31 +65,44 @@ const EVENT_STYLES: Record<string, string> = {
   step_complete: "border-emerald-200 dark:border-emerald-800 bg-emerald-50/50 dark:bg-emerald-900/10",
   execution_complete: "border-emerald-300 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-900/20",
   execution_failed: "border-red-300 dark:border-red-700 bg-red-50/50 dark:bg-red-900/10",
+  message_persisted: "border-sky-200 dark:border-sky-800 bg-sky-50/50 dark:bg-sky-900/10",
   error: "border-red-200 dark:border-red-800 bg-red-50/50 dark:bg-red-900/10",
   heartbeat: "border-slate-100 dark:border-slate-800 opacity-50",
 };
 
-function LiveLogPanel({ events }: { events: any[] }) {
+function TimelinePanel({
+  events,
+  traces,
+  langfuseAuthError,
+  isTerminal,
+}: {
+  events: any[];
+  traces: any[];
+  langfuseAuthError?: boolean;
+  isTerminal: boolean;
+}) {
   const bottomRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [events]);
+  }, [events, traces]);
 
-  if (events.length === 0) {
+  const filteredEvents = events.filter((e) => e.type !== "heartbeat");
+
+  if (filteredEvents.length === 0 && traces.length === 0) {
     return (
       <div className="flex items-center justify-center h-40 text-slate-400 dark:text-slate-500 text-sm">
-        Waiting for execution events…
+        Waiting for execution events...
       </div>
     );
   }
 
   return (
     <div className="space-y-2 overflow-y-auto max-h-[55vh] pr-1">
-      {events.map((ev, i) => {
-        if (ev.type === "heartbeat") return null;
+      {/* Live events */}
+      {filteredEvents.map((ev, i) => {
         const style = EVENT_STYLES[ev.type] ?? "border-slate-200 dark:border-slate-700";
         return (
-          <div key={i} className={`rounded-lg border px-4 py-3 ${style}`}>
+          <div key={`ev-${i}`} className={`rounded-lg border px-4 py-3 ${style}`}>
             <div className="flex items-center gap-2 text-xs mb-1">
               <span className="font-mono font-semibold text-slate-600 dark:text-slate-300">
                 {ev.type}
@@ -93,69 +122,61 @@ function LiveLogPanel({ events }: { events: any[] }) {
           </div>
         );
       })}
-      <div ref={bottomRef} />
-    </div>
-  );
-}
 
-function TracesPanel({ traces, langfuseAuthError }: { traces: any[]; langfuseAuthError?: boolean }) {
-  if (langfuseAuthError) {
-    return (
-      <div className="flex flex-col items-center justify-center h-52 gap-3 text-center px-4">
-        <div className="text-2xl">🔑</div>
-        <div className="font-medium text-slate-700 dark:text-slate-300 text-sm">Langfuse credentials not configured</div>
-        <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm">
-          To see LLM traces, token counts, and costs here, you need to set up Langfuse API keys.
-        </p>
-        <ol className="text-xs text-slate-500 dark:text-slate-400 text-left space-y-1 max-w-sm">
-          <li>1. Open <a href="http://localhost:3000" target="_blank" rel="noreferrer" className="text-indigo-500 hover:underline">localhost:3000</a> and create a Langfuse account</li>
-          <li>2. Create a project → Settings → API Keys → copy Public + Secret keys</li>
-          <li>3. Go to <a href="/settings" className="text-indigo-500 hover:underline">Settings</a> and paste both keys in the Langfuse section</li>
-        </ol>
-      </div>
-    );
-  }
-
-  if (traces.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center h-40 gap-2 text-slate-400 dark:text-slate-500 text-sm">
-        <span>No traces yet.</span>
-        <span className="text-xs">Traces appear after execution completes and Langfuse ingests them.</span>
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-3 overflow-y-auto max-h-[55vh]">
-      {traces.map((trace: any) => (
-        <div
-          key={trace.id}
-          className="rounded-lg border border-slate-200 dark:border-slate-700 px-4 py-3 space-y-1"
-        >
-          <div className="flex items-center justify-between text-xs">
-            <span className="font-semibold text-slate-700 dark:text-slate-300 font-mono">
-              {trace.name ?? trace.id?.slice(0, 12)}
-            </span>
-            <span className="text-slate-400 dark:text-slate-500">
-              {trace.timestamp ? new Date(trace.timestamp).toLocaleTimeString() : ""}
-            </span>
+      {/* Langfuse traces (shown after execution completes) */}
+      {isTerminal && traces.length > 0 && (
+        <>
+          <div className="flex items-center gap-2 pt-3 pb-1">
+            <div className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
+            <span className="text-xs text-slate-400 dark:text-slate-500 font-medium">LLM Traces</span>
+            <div className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
           </div>
-          <div className="flex gap-4 text-xs text-slate-500 dark:text-slate-400">
-            {trace.usage?.input != null && (
-              <span>Prompt: {trace.usage.input} tokens</span>
-            )}
-            {trace.usage?.output != null && (
-              <span>Completion: {trace.usage.output} tokens</span>
-            )}
-            {trace.totalCost != null && (
-              <span>Cost: ${trace.totalCost.toFixed(6)}</span>
-            )}
-            {trace.latency != null && (
-              <span>Latency: {trace.latency}ms</span>
-            )}
-          </div>
+          {traces.map((trace: any) => (
+            <div
+              key={trace.id}
+              className="rounded-lg border border-violet-200 dark:border-violet-800 bg-violet-50/30 dark:bg-violet-900/10 px-4 py-3 space-y-1"
+            >
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-semibold text-slate-700 dark:text-slate-300 font-mono">
+                  {trace.name ?? trace.id?.slice(0, 12)}
+                </span>
+                <span className="text-slate-400 dark:text-slate-500">
+                  {trace.timestamp ? new Date(trace.timestamp).toLocaleTimeString() : ""}
+                </span>
+              </div>
+              <div className="flex gap-4 text-xs text-slate-500 dark:text-slate-400">
+                {trace.usage?.input != null && (
+                  <span>Prompt: {trace.usage.input} tokens</span>
+                )}
+                {trace.usage?.output != null && (
+                  <span>Completion: {trace.usage.output} tokens</span>
+                )}
+                {trace.totalCost != null && (
+                  <span>Cost: ${trace.totalCost.toFixed(6)}</span>
+                )}
+                {trace.latency != null && (
+                  <span>Latency: {trace.latency}ms</span>
+                )}
+              </div>
+            </div>
+          ))}
+        </>
+      )}
+
+      {/* Langfuse auth error notice */}
+      {isTerminal && langfuseAuthError && (
+        <div className="rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-900/10 px-4 py-3 text-center">
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            Langfuse credentials not configured.{" "}
+            <a href="/settings" className="text-indigo-500 hover:underline">
+              Set up in Settings
+            </a>{" "}
+            to see LLM traces, token counts, and costs.
+          </p>
         </div>
-      ))}
+      )}
+
+      <div ref={bottomRef} />
     </div>
   );
 }
@@ -249,13 +270,14 @@ export default function ExecutionDetailPage() {
 
   const [execution, setExecution] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState<Tab>("live");
+  const [tab, setTab] = useState<Tab>("timeline");
   const [liveEvents, setLiveEvents] = useState<any[]>([]);
   const [wsStatus, setWsStatus] = useState<string>("closed");
   const [traces, setTraces] = useState<any[]>([]);
   const [langfuseAuthError, setLangfuseAuthError] = useState(false);
   const [messages, setMessages] = useState<any[]>([]);
   const [metrics, setMetrics] = useState<any>(null);
+  const [copied, setCopied] = useState(false);
   const wsRef = useRef<WebSocket | null>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -276,11 +298,14 @@ export default function ExecutionDetailPage() {
       return;
     }
 
-    const ws = createMonitorWebSocket(id);
-    wsRef.current = ws;
+    let cancelled = false;
     setWsStatus("connecting");
 
-    ws.onopen = () => {
+    createMonitorWebSocket(id).then((ws) => {
+      if (cancelled) { ws.close(); return; }
+      wsRef.current = ws;
+
+      ws.onopen = () => {
       setWsStatus("open");
       // Clear polling fallback once WS is established
       if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
@@ -289,6 +314,20 @@ export default function ExecutionDetailPage() {
       try {
         const event = JSON.parse(e.data);
         setLiveEvents((prev) => [...prev, event]);
+
+        // Append streamed messages live
+        if (event.type === "message_persisted") {
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: `live-${Date.now()}`,
+              from_agent: event.agent_name ?? "agent",
+              message_type: event.message_type ?? "agent_response",
+              content: event.message,
+              created_at: event.timestamp ?? new Date().toISOString(),
+            },
+          ]);
+        }
 
         // Update execution status from terminal events
         if (event.type === "execution_complete") {
@@ -301,27 +340,29 @@ export default function ExecutionDetailPage() {
         setLiveEvents((prev) => [...prev, { type: "raw", message: e.data }]);
       }
     };
-    ws.onerror = () => setWsStatus("error");
-    ws.onclose = () => {
-      setWsStatus("closed");
-      // Start polling fallback when WS closes unexpectedly (e.g. server restart)
-      if (pollRef.current) return;
-      pollRef.current = setInterval(async () => {
-        const res = await executionsAPI.get(id);
-        if (res.data) {
-          const updated = res.data as any;
-          setExecution(updated);
-          if (TERMINAL_STATUSES.has(updated.status)) {
-            clearInterval(pollRef.current!);
-            pollRef.current = null;
-            loadHistoricalData();
+      ws.onerror = () => setWsStatus("error");
+      ws.onclose = () => {
+        setWsStatus("closed");
+        // Start polling fallback when WS closes unexpectedly (e.g. server restart)
+        if (pollRef.current) return;
+        pollRef.current = setInterval(async () => {
+          const res = await executionsAPI.get(id);
+          if (res.data) {
+            const updated = res.data as any;
+            setExecution(updated);
+            if (TERMINAL_STATUSES.has(updated.status)) {
+              clearInterval(pollRef.current!);
+              pollRef.current = null;
+              loadHistoricalData();
+            }
           }
-        }
-      }, 3000);
-    };
+        }, 3000);
+      };
+    });
 
     return () => {
-      ws.close();
+      cancelled = true;
+      wsRef.current?.close();
       wsRef.current = null;
       if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
     };
@@ -362,9 +403,9 @@ export default function ExecutionDetailPage() {
   const end = execution.completed_at ? new Date(execution.completed_at) : null;
   const durationSec = start && end ? Math.round((end.getTime() - start.getTime()) / 1000) : null;
 
+  const timelineCount = liveEvents.filter(e => e.type !== "heartbeat").length + traces.length;
   const TABS: { id: Tab; label: string; count?: number }[] = [
-    { id: "live", label: "Live Log", count: liveEvents.filter(e => e.type !== "heartbeat").length },
-    { id: "traces", label: "Traces", count: traces.length },
+    { id: "timeline", label: "Timeline", count: timelineCount },
     { id: "messages", label: "Messages", count: messages.length },
   ];
 
@@ -420,9 +461,45 @@ export default function ExecutionDetailPage() {
                 <span className="text-emerald-600 dark:text-emerald-400">✓</span>
                 <h2 className="font-semibold text-slate-900 dark:text-slate-100 text-sm">Final Result</h2>
               </div>
-              {isJson && (
-                <span className="text-xs text-slate-400">raw output</span>
-              )}
+              <div className="flex items-center gap-2">
+                {isJson && (
+                  <span className="text-xs text-slate-400">raw output</span>
+                )}
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(text!);
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                  }}
+                  className="text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 flex items-center gap-1 px-2 py-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                >
+                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                  </svg>
+                  {copied ? "Copied!" : "Copy"}
+                </button>
+                <button
+                  onClick={() => {
+                    const frontMatter = `---\nexecution: ${execution.id}\nworkflow: ${execution.workflow_name || execution.workflow_id}\nstatus: ${execution.status}\ndate: ${execution.started_at}\n---\n\n`;
+                    const blob = new Blob([frontMatter + text!], { type: "text/markdown" });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = `execution-${execution.id.slice(0, 8)}.md`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                  }}
+                  className="text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 flex items-center gap-1 px-2 py-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                >
+                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" y1="15" x2="12" y2="3" />
+                  </svg>
+                  .md
+                </button>
+              </div>
             </CardHeader>
             <CardBody>
               {isJson ? (
@@ -464,15 +541,21 @@ export default function ExecutionDetailPage() {
               </button>
             ))}
           </div>
-          {tab === "live" && isLive && (
+          {tab === "timeline" && isLive && (
             <Badge variant="running" pulse className="ml-auto mr-1">
               Live
             </Badge>
           )}
         </CardHeader>
         <CardBody>
-          {tab === "live" && <LiveLogPanel events={liveEvents} />}
-          {tab === "traces" && <TracesPanel traces={traces} langfuseAuthError={langfuseAuthError} />}
+          {tab === "timeline" && (
+            <TimelinePanel
+              events={liveEvents}
+              traces={traces}
+              langfuseAuthError={langfuseAuthError}
+              isTerminal={!isLive}
+            />
+          )}
           {tab === "messages" && <MessagesPanel messages={messages} />}
         </CardBody>
       </Card>

@@ -18,6 +18,9 @@ import Link from "next/link";
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const PROVIDERS = [
+  { value: "openai", label: "OpenAI" },
+  { value: "anthropic", label: "Anthropic" },
+  { value: "google", label: "Google Gemini" },
   { value: "ollama", label: "Ollama (Local)" },
   { value: "openrouter", label: "OpenRouter" },
   { value: "glm51", label: "GLM-5.1 (Cloud)" },
@@ -27,30 +30,55 @@ const AVAILABLE_TOOLS = ["web_search","weather","calculator","code_executor","ht
 
 // ─── Input Node Panel ──────────────────────────────────────────────────────────
 
+const INPUT_SOURCES = [
+  { id: "web", icon: "💬", label: "Web", desc: "Type a message when you click Run" },
+  { id: "telegram", icon: "📱", label: "Telegram", desc: "Receive messages from your Telegram bot" },
+  { id: "schedule", icon: "⏰", label: "Schedule", desc: "Run on a cron schedule" },
+  { id: "webhook", icon: "🔗", label: "Webhook", desc: "Trigger via HTTP POST" },
+];
+
 function InputNodePanel({
+  node,
   onClose,
   onRunNow,
   defaultMessage,
   onDefaultMessageChange,
   onSave,
+  onNodeDataChange,
 }: {
+  node: Node;
   onClose: () => void;
   onRunNow: () => void;
   defaultMessage: string;
   onDefaultMessageChange: (v: string) => void;
-  onSave?: (msg: string) => void;
+  onSave?: (msg: string, source?: string, sourceConfig?: any) => void;
+  onNodeDataChange?: (nodeId: string, data: Record<string, unknown>) => void;
 }) {
+  const d = node.data as any;
+  const [source, setSource] = useState<string>(d.source ?? "web");
+  const [cronExpression, setCronExpression] = useState<string>(d.sourceConfig?.cron ?? "");
+  const [scheduleMessage, setScheduleMessage] = useState<string>(d.sourceConfig?.inputMessage ?? "");
+  const [botUsername, setBotUsername] = useState<string>(d.sourceConfig?.botUsername ?? "");
+
   useEffect(() => {
     function onKey(e: KeyboardEvent) { if (e.key === "Escape") onClose(); }
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, [onClose]);
 
+  function handleSave() {
+    const sourceConfig: any = {};
+    if (source === "telegram") sourceConfig.botUsername = botUsername;
+    if (source === "schedule") { sourceConfig.cron = cronExpression; sourceConfig.inputMessage = scheduleMessage; }
+    if (onSave) onSave(defaultMessage, source, sourceConfig);
+    if (onNodeDataChange) onNodeDataChange(node.id, { source, sourceConfig });
+    onClose();
+  }
+
   return (
     <>
       <div className="fixed inset-0 z-30" onClick={onClose} />
       <div className="absolute top-0 right-0 h-full w-80 z-40 bg-white dark:bg-slate-800 border-l border-slate-200 dark:border-slate-700 shadow-2xl flex flex-col">
-        {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-slate-700 shrink-0">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Input Node</p>
@@ -59,67 +87,114 @@ function InputNodePanel({
           <button onClick={onClose} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-lg leading-none">✕</button>
         </div>
 
-        {/* Body */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
-          {/* How input flows */}
-          <div className="rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-3 space-y-2">
-            <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">How input flows</p>
-            <ol className="text-xs text-slate-600 dark:text-slate-400 space-y-1.5 list-decimal list-inside">
-              <li>Click <span className="font-semibold text-indigo-600 dark:text-indigo-400">▶ Run</span> in the toolbar</li>
-              <li>A dialog asks you to type a message or task</li>
-              <li>That message enters the workflow here at this node</li>
-              <li>It flows to the first connected agent as their task</li>
-            </ol>
-          </div>
-
-          {/* Default message */}
-          <div className="space-y-1">
-            <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
-              Default message <span className="text-slate-400 font-normal">(optional)</span>
-            </label>
-            <textarea
-              rows={3}
-              value={defaultMessage}
-              onChange={(e) => onDefaultMessageChange(e.target.value)}
-              placeholder="Pre-fill the Run dialog with this message…"
-              className="w-full rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
-            />
-            <p className="text-xs text-slate-400">This will pre-fill the run dialog so you don&apos;t have to retype it each time.</p>
-          </div>
-
-          {/* Supported trigger types */}
+          {/* Source selector */}
           <div className="space-y-2">
-            <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">Input sources</p>
+            <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">Input source</p>
             <div className="space-y-1.5">
-              {[
-                { icon: "💬", label: "Web Run", desc: "Type a message when you click ▶ Run", active: true },
-                { icon: "📱", label: "Telegram", desc: "Add a Telegram Trigger node to receive messages from your bot", active: false },
-                { icon: "⏰", label: "Schedule", desc: "Add a Schedule Trigger node to run on a cron", active: false },
-              ].map((s) => (
-                <div key={s.label} className={`flex items-start gap-2 rounded-lg px-3 py-2 text-xs ${s.active ? "bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-700" : "bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700"}`}>
+              {INPUT_SOURCES.map((s) => (
+                <button
+                  key={s.id}
+                  type="button"
+                  onClick={() => setSource(s.id)}
+                  className={`w-full flex items-start gap-2 rounded-lg px-3 py-2 text-xs text-left transition-colors ${
+                    source === s.id
+                      ? "bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-700"
+                      : "bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
+                  }`}
+                >
                   <span>{s.icon}</span>
                   <div>
-                    <p className={`font-medium ${s.active ? "text-indigo-700 dark:text-indigo-300" : "text-slate-600 dark:text-slate-400"}`}>{s.label}{s.active && <span className="ml-1 text-indigo-500">● active</span>}</p>
+                    <p className={`font-medium ${source === s.id ? "text-indigo-700 dark:text-indigo-300" : "text-slate-600 dark:text-slate-400"}`}>
+                      {s.label}
+                      {source === s.id && <span className="ml-1 text-indigo-500">● active</span>}
+                    </p>
                     <p className="text-slate-500 dark:text-slate-500">{s.desc}</p>
                   </div>
-                </div>
+                </button>
               ))}
             </div>
           </div>
+
+          {/* Source-specific config */}
+          {source === "telegram" && (
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-slate-700 dark:text-slate-300">Bot username</label>
+              <input
+                value={botUsername}
+                onChange={(e) => setBotUsername(e.target.value)}
+                placeholder="@your_bot"
+                className="w-full rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+              <p className="text-xs text-purple-500 dark:text-purple-400">Output will also be sent back to Telegram.</p>
+            </div>
+          )}
+
+          {source === "schedule" && (
+            <div className="space-y-3">
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-slate-700 dark:text-slate-300">Cron expression</label>
+                <input
+                  value={cronExpression}
+                  onChange={(e) => setCronExpression(e.target.value)}
+                  placeholder="0 9 * * * (daily at 9 AM)"
+                  className="w-full rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-slate-700 dark:text-slate-300">Input message</label>
+                <textarea
+                  rows={2}
+                  value={scheduleMessage}
+                  onChange={(e) => setScheduleMessage(e.target.value)}
+                  placeholder="Message to send on each scheduled run..."
+                  className="w-full rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                />
+              </div>
+            </div>
+          )}
+
+          {source === "webhook" && (
+            <div className="rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-3">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                A webhook URL will be generated after saving. Send a POST request with a JSON body containing a <code className="text-indigo-500">message</code> field.
+              </p>
+            </div>
+          )}
+
+          {/* Default message (always shown for web, hidden for schedule which has its own) */}
+          {source !== "schedule" && (
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                Default message <span className="text-slate-400 font-normal">(optional)</span>
+              </label>
+              <textarea
+                rows={3}
+                value={defaultMessage}
+                onChange={(e) => onDefaultMessageChange(e.target.value)}
+                placeholder="Pre-fill the Run dialog with this message..."
+                className="w-full rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+              />
+            </div>
+          )}
+
+          {/* Output note */}
+          <div className="rounded-lg bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-200 dark:border-emerald-800 p-3">
+            <p className="text-xs text-emerald-700 dark:text-emerald-400">
+              Output will be delivered to: <span className="font-semibold">{source === "web" ? "Execution page" : source === "telegram" ? "Telegram" : source === "schedule" ? "Execution page" : "Webhook response"}</span>
+            </p>
+          </div>
         </div>
 
-        {/* Footer */}
         <div className="px-4 py-3 border-t border-slate-200 dark:border-slate-700 flex gap-2 shrink-0">
           <button onClick={onClose} className="flex-1 rounded-lg border border-slate-200 dark:border-slate-700 text-sm py-2 text-slate-600 dark:text-slate-400">Close</button>
-          {onSave && (
-            <button
-              onClick={() => { onSave(defaultMessage); onClose(); }}
-              className="flex-1 rounded-lg border border-indigo-200 dark:border-indigo-700 text-indigo-600 dark:text-indigo-400 text-sm py-2"
-            >
-              Save
-            </button>
-          )}
-          <button onClick={() => { onClose(); onRunNow(); }} className="flex-1 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium py-2">▶ Run now</button>
+          <button
+            onClick={handleSave}
+            className="flex-1 rounded-lg border border-indigo-200 dark:border-indigo-700 text-indigo-600 dark:text-indigo-400 text-sm py-2"
+          >
+            Save
+          </button>
+          <button onClick={() => { onClose(); onRunNow(); }} className="flex-1 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium py-2">Run</button>
         </div>
       </div>
     </>
@@ -465,6 +540,7 @@ function TriggerConfigPanel({
 function NodeConfigPanel({
   node,
   agents,
+  presets,
   onClose,
   onAssign,
   onSaveAgent,
@@ -472,6 +548,7 @@ function NodeConfigPanel({
 }: {
   node: Node;
   agents: Agent[];
+  presets: any[];
   onClose: () => void;
   onAssign: (nodeId: string, agentId: string) => void;
   onSaveAgent: (nodeId: string, agentId: string, form: Partial<Agent>) => Promise<void>;
@@ -496,6 +573,29 @@ function NodeConfigPanel({
   });
   const [savingAgent, setSavingAgent] = useState(false);
   const [changeAgentOpen, setChangeAgentOpen] = useState(!currentAgentId);
+  const [creatingPreset, setCreatingPreset] = useState<string | null>(null);
+
+  async function handlePresetClick(preset: any) {
+    setCreatingPreset(preset.preset_id);
+    try {
+      const res = await agentsAPI.create({
+        name: preset.name,
+        role: preset.role,
+        system_prompt: preset.system_prompt,
+        provider: preset.provider,
+        model: preset.model,
+        tools: preset.tools ?? [],
+      });
+      if (res.data) {
+        const newAgent = res.data as any;
+        onAssign(node.id, newAgent.id);
+      }
+    } catch (err) {
+      // silently fail
+    } finally {
+      setCreatingPreset(null);
+    }
+  }
 
   // Close on Escape
   useEffect(() => {
@@ -666,6 +766,36 @@ function NodeConfigPanel({
                   </p>
                 )}
               </div>
+
+              {/* Preset agents */}
+              {presets.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                    Or use a preset
+                  </p>
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {presets.map((preset: any) => (
+                      <button
+                        key={preset.preset_id}
+                        type="button"
+                        onClick={() => handlePresetClick(preset)}
+                        disabled={creatingPreset !== null}
+                        className="flex items-center gap-2 px-2.5 py-2 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-700 bg-white dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors text-left disabled:opacity-50"
+                      >
+                        <div className="h-6 w-6 rounded-md bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-400 shrink-0">
+                          {preset.name?.charAt(0)?.toUpperCase() ?? "P"}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-xs font-medium text-slate-700 dark:text-slate-300 truncate">
+                            {creatingPreset === preset.preset_id ? "Creating..." : preset.name}
+                          </p>
+                          <p className="text-[10px] text-slate-400 truncate">{preset.role}</p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </>
           )}
         </div>
@@ -703,6 +833,7 @@ export default function WorkflowDetailPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [running, setRunning] = useState(false);
+  const [presets, setPresets] = useState<any[]>([]);
 
   // Rename state
   const [editingName, setEditingName] = useState(false);
@@ -733,9 +864,9 @@ export default function WorkflowDetailPage() {
   const startOverlay = useCallback((execId: string) => {
     setActiveExecId(execId);
     setNodeStatus({});
-    const ws = createMonitorWebSocket(execId);
-    wsOverlayRef.current = ws;
-    ws.onmessage = (e) => {
+    createMonitorWebSocket(execId).then((ws) => {
+      wsOverlayRef.current = ws;
+      ws.onmessage = (e) => {
       try {
         const ev = JSON.parse(e.data);
         if (ev.type === "step_start" && ev.node_id) {
@@ -748,7 +879,8 @@ export default function WorkflowDetailPage() {
         }
       } catch { /* ignore parse errors */ }
     };
-    ws.onclose = () => setActiveExecId(null);
+      ws.onclose = () => setActiveExecId(null);
+    });
   }, []);
 
   useEffect(() => {
@@ -765,6 +897,9 @@ export default function WorkflowDetailPage() {
         setEdges(wf.edges ?? graphDef.edges ?? []);
       }
       setLoading(false);
+    });
+    agentsAPI.presets().then((res) => {
+      if (res.data) setPresets(res.data as any[]);
     });
     return () => {
       setNodes([]);
@@ -833,6 +968,19 @@ export default function WorkflowDetailPage() {
     setNodes(nodes.filter(n => n.id !== nodeId));
     setEdges(edges.filter(e => e.source !== nodeId && e.target !== nodeId));
     setSelectedNode(null);
+  }
+
+  async function handlePresetDropOnCanvas(preset: any) {
+    const res = await agentsAPI.create({
+      name: preset.name,
+      role: preset.role,
+      instructions: preset.instructions,
+      provider: preset.provider,
+      model: preset.model,
+      tools: preset.tools ?? [],
+    });
+    const agent = res.data as any;
+    return { agentId: agent.id, name: agent.name, role: agent.role, provider: agent.provider };
   }
 
   // When workflow loads, seed nameValue
@@ -1014,13 +1162,20 @@ export default function WorkflowDetailPage() {
 
       {/* Canvas (relative so the panel can overlay it) */}
       <div className="flex-1 min-h-0 relative">
-        <WorkflowCanvas agents={agents} onNodeClick={handleNodeClick} nodeStatus={nodeStatus} />
+        <WorkflowCanvas
+          agents={agents}
+          onNodeClick={handleNodeClick}
+          nodeStatus={nodeStatus}
+          presets={presets}
+          onPresetDrop={handlePresetDropOnCanvas}
+        />
 
         {/* Node config panel — overlays the canvas */}
         {selectedNode && ["agent", "supervisor", "swarm"].includes(selectedNode.type ?? "") && (
           <NodeConfigPanel
             node={selectedNode}
             agents={agents}
+            presets={presets}
             onClose={() => setSelectedNode(null)}
             onAssign={assignAgentToNode}
             onSaveAgent={handleSaveAgent}
@@ -1043,16 +1198,26 @@ export default function WorkflowDetailPage() {
         {/* Input node panel */}
         {selectedNode && selectedNode.type === "input" && (
           <InputNodePanel
+            node={selectedNode}
             onClose={() => setSelectedNode(null)}
             onRunNow={handleRunClick}
             defaultMessage={defaultRunInput}
             onDefaultMessageChange={setDefaultRunInput}
-            onSave={(msg) => {
-              // Persist defaultMessage into the node.data so it shows on the canvas
-              // and is preserved when the workflow is saved.
+            onSave={(msg, source, sourceConfig) => {
               const nodeId = selectedNode.id;
+              setNodes(nodes.map((n) => {
+                if (n.id === nodeId) {
+                  return { ...n, data: { ...n.data, defaultMessage: msg, source, sourceConfig } };
+                }
+                if (source && n.type === "output") {
+                  return { ...n, data: { ...n.data, inputSource: source } };
+                }
+                return n;
+              }));
+            }}
+            onNodeDataChange={(nodeId, data) => {
               setNodes(nodes.map((n) =>
-                n.id === nodeId ? { ...n, data: { ...n.data, defaultMessage: msg } } : n
+                n.id === nodeId ? { ...n, data: { ...n.data, ...data } } : n
               ));
             }}
           />

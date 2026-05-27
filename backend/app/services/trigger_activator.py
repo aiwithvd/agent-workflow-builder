@@ -22,16 +22,17 @@ CANVAS_TO_TRIGGER_TYPE = {
 async def activate_workflow_triggers(workflow_id: UUID, graph_definition: dict) -> None:
     """Read trigger nodes from a workflow's graph_definition and upsert DB rows.
 
-    Also synchronises schedule triggers with APScheduler.
+    Also synthesises triggers from the Input node's source config.
     Called after workflow create/update.
     """
-    trigger_nodes = [
-        n for n in graph_definition.get("nodes", [])
-        if n.get("type") in CANVAS_TO_TRIGGER_TYPE
-    ]
+    nodes = graph_definition.get("nodes", [])
+
+    trigger_nodes = [n for n in nodes if n.get("type") in CANVAS_TO_TRIGGER_TYPE]
+
+    # Synthesise a trigger from the Input node's source selector
+    input_triggers = _triggers_from_input_node(nodes)
 
     async with async_session() as db:
-        # Remove old triggers for this workflow then re-insert current ones.
         await db.execute(
             delete(WorkflowTrigger).where(WorkflowTrigger.workflow_id == workflow_id)
         )
@@ -61,10 +62,56 @@ async def activate_workflow_triggers(workflow_id: UUID, graph_definition: dict) 
                 active=True,
             ))
 
+        for t in input_triggers:
+            db.add(WorkflowTrigger(
+                workflow_id=workflow_id,
+                node_id=t["node_id"],
+                trigger_type=t["trigger_type"],
+                config=t["config"],
+                active=True,
+            ))
+
         await db.commit()
 
-    # Keep APScheduler in sync with schedule triggers
-    await _sync_scheduler(workflow_id, trigger_nodes)
+    all_trigger_nodes = trigger_nodes + [
+        {"id": t["node_id"], "type": f"{t['trigger_type']}_trigger", "data": t["config"]}
+        for t in input_triggers if t["trigger_type"] == "schedule"
+    ]
+    await _sync_scheduler(workflow_id, all_trigger_nodes)
+
+
+def _triggers_from_input_node(nodes: list[dict]) -> list[dict]:
+    """Extract trigger config from an input node's source field."""
+    input_nodes = [n for n in nodes if n.get("type") == "input"]
+    triggers: list[dict] = []
+    for node in input_nodes:
+        data = node.get("data", {})
+        source = data.get("source")
+        if not source or source == "web":
+            continue
+        node_id = node.get("id", "input-source")
+        if source == "telegram":
+            triggers.append({
+                "node_id": node_id,
+                "trigger_type": "telegram",
+                "config": {"bot_token_override": data.get("botUsername", "")},
+            })
+        elif source == "schedule":
+            triggers.append({
+                "node_id": node_id,
+                "trigger_type": "schedule",
+                "config": {
+                    "cron": data.get("cron", ""),
+                    "input_message": data.get("scheduleMessage", "Run scheduled workflow."),
+                },
+            })
+        elif source == "webhook":
+            triggers.append({
+                "node_id": node_id,
+                "trigger_type": "webhook",
+                "config": {},
+            })
+    return triggers
 
 
 async def deactivate_workflow_triggers(workflow_id: UUID) -> None:

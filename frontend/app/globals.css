@@ -53,6 +53,37 @@
   background-color: #1e293b;
 }
 
+/* React Flow's built-in `input` and `output` node types ship default white
+   box styling (padding, border, fixed 150px width, hover/focus shadows) that
+   wraps our custom InputNode/OutputNode components. Strip it so the inner
+   bg-slate-600 / bg-emerald-800 element owns the entire visual.
+
+   Note: React Flow's own rules live in the per-route page.css which loads
+   AFTER this layout-level globals.css. To win the cascade we need higher
+   specificity than (0,1,0) — chain `.react-flow__node` with the type class
+   to get (0,2,0). */
+.react-flow__node.react-flow__node-input,
+.react-flow__node.react-flow__node-output {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  width: auto;
+  font-size: inherit;
+  color: inherit;
+}
+
+.react-flow__node.react-flow__node-input.selectable:hover,
+.react-flow__node.react-flow__node-output.selectable:hover,
+.react-flow__node.react-flow__node-input.selectable.selected,
+.react-flow__node.react-flow__node-output.selectable.selected,
+.react-flow__node.react-flow__node-input.selectable:focus,
+.react-flow__node.react-flow__node-output.selectable:focus,
+.react-flow__node.react-flow__node-input.selectable:focus-visible,
+.react-flow__node.react-flow__node-output.selectable:focus-visible {
+  box-shadow: none;
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;

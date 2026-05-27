@@ -15,9 +15,6 @@ from app.runtime.graph_builder import build_graph_from_definition
 logger = logging.getLogger(__name__)
 
 
-_langfuse_initialized = False
-
-
 def _serialize_for_db(obj):
     """Recursively convert LangChain BaseMessage objects to plain dicts.
 
@@ -43,32 +40,43 @@ def _serialize_for_db(obj):
         return str(obj)
 
 
-def _get_langfuse_handler(execution_id: str):
+async def _get_langfuse_handler(execution_id: str):
     """Return a Langfuse v3 CallbackHandler tagged with the execution_id.
 
-    Initializes the global Langfuse singleton on first call.  Returns None
-    if Langfuse is not configured or the SDK is unavailable so that the
-    executor degrades gracefully without crashing the workflow run.
+    Reads credentials from the PlatformSetting DB table (set via Settings UI),
+    falling back to env vars. Returns None if credentials are missing or the
+    Langfuse SDK is unavailable so the executor degrades gracefully.
     """
-    global _langfuse_initialized
     try:
-        from langfuse import Langfuse, get_client
         from langfuse.langchain import CallbackHandler
-        from app.config import settings
+        from app.models.settings import PlatformSetting
 
-        if not settings.langfuse_public_key or not settings.langfuse_secret_key:
+        async with async_session() as db:
+            pk = await db.get(PlatformSetting, "langfuse_public_key")
+            sk = await db.get(PlatformSetting, "langfuse_secret_key")
+            host = await db.get(PlatformSetting, "langfuse_host")
+
+        public_key = pk.value if pk and pk.value else None
+        secret_key = sk.value if sk and sk.value else None
+        host_url = host.value if host and host.value else None
+
+        if not public_key or not secret_key:
+            from app.config import settings as env_settings
+            public_key = public_key or env_settings.langfuse_public_key
+            secret_key = secret_key or env_settings.langfuse_secret_key
+            host_url = host_url or env_settings.langfuse_host
+
+        if not public_key or not secret_key or public_key == "lf-pub-local":
             logger.warning("Langfuse unavailable, tracing disabled: credentials not set")
             return None
 
-        if not _langfuse_initialized:
-            Langfuse(
-                public_key=settings.langfuse_public_key,
-                secret_key=settings.langfuse_secret_key,
-                host=settings.langfuse_host,
-            )
-            _langfuse_initialized = True
-
-        return CallbackHandler()
+        return CallbackHandler(
+            public_key=public_key,
+            secret_key=secret_key,
+            host=host_url or "http://langfuse:3000",
+            session_id=execution_id,
+            trace_name=f"execution-{execution_id[:8]}",
+        )
     except Exception as e:
         logger.warning("Langfuse unavailable, tracing disabled: %s", e)
         return None
@@ -170,7 +178,7 @@ class ExecutionService:
                 raise
 
             # Langfuse tracing handler — optional, gracefully skipped if unavailable
-            lf_handler = _get_langfuse_handler(exec_id_str)
+            lf_handler = await _get_langfuse_handler(exec_id_str)
             callbacks = [lf_handler] if lf_handler else []
 
             initial_state = {
@@ -196,6 +204,7 @@ class ExecutionService:
                 # Stream events per node so we can emit live step events
                 result = None
                 active_nodes: set[str] = set()
+                streamed_msg_set: set[str] = set()
 
                 async for event in graph.astream_events(initial_state, config=config, version="v2"):
                     kind = event.get("event", "")
@@ -212,7 +221,6 @@ class ExecutionService:
 
                     elif kind == "on_chain_end" and name not in ("LangGraph", "__start__", "__end__"):
                         active_nodes.discard(name)
-                        # Capture output tokens if available
                         output = event.get("data", {}).get("output", {})
                         await event_bus.publish(exec_id_str, event_bus.make_event(
                             "step_complete",
@@ -220,6 +228,11 @@ class ExecutionService:
                             agent_name=name,
                             node_id=name,
                         ))
+
+                        # Stream-persist the latest message from this node
+                        await self._stream_persist_message(
+                            db, execution_id, exec_id_str, name, output, streamed_msg_set,
+                        )
 
                     elif kind == "on_chain_end" and name == "LangGraph":
                         # Final state from the top-level graph
@@ -245,7 +258,7 @@ class ExecutionService:
                     execution.completed_at = datetime.now(timezone.utc)
                     await db.commit()
 
-                # Persist all messages from the workflow run
+                # Reconciliation: persist any messages not already streamed
                 all_messages = result.get("messages", [])
                 for msg in all_messages:
                     msg_type = getattr(msg, "type", None) or getattr(msg, "role", None) or "unknown"
@@ -275,8 +288,12 @@ class ExecutionService:
                     else:
                         m_type = MessageType.AGENT_RESPONSE
 
-                    # Skip empty content
                     if not content or not str(content).strip():
+                        continue
+
+                    from_agent = getattr(msg, "name", None) or msg_type
+                    sig = f"{from_agent}:{str(content)[:200]}"
+                    if sig in streamed_msg_set:
                         continue
 
                     await self._persist_message(
@@ -284,7 +301,7 @@ class ExecutionService:
                         execution_id=execution_id,
                         content=str(content)[:4000],
                         message_type=m_type,
-                        from_agent=getattr(msg, "name", None) or msg_type,
+                        from_agent=from_agent,
                     )
 
                 # Deliver output via configured channels from the output node
@@ -456,6 +473,59 @@ class ExecutionService:
                 await client.post(webhook_url, json=payload)
         except Exception as e:
             logger.warning("Webhook delivery to %s failed: %s", webhook_url, e)
+
+    @staticmethod
+    async def _stream_persist_message(
+        self,
+        db: AsyncSession,
+        execution_id: UUID,
+        exec_id_str: str,
+        agent_name: str,
+        output: dict,
+        seen: set[str],
+    ) -> None:
+        """Persist the latest message from a node's output and publish it live."""
+        try:
+            messages = output.get("messages", [])
+            if not messages:
+                return
+            msg = messages[-1]
+            content = getattr(msg, "content", None) or (msg.get("content") if isinstance(msg, dict) else None)
+            if not content:
+                return
+            if isinstance(content, list):
+                content = " ".join(
+                    p.get("text", str(p)) if isinstance(p, dict) else str(p)
+                    for p in content
+                )
+            content = str(content).strip()
+            if not content:
+                return
+            # Deduplicate by content hash
+            sig = f"{agent_name}:{content[:200]}"
+            if sig in seen:
+                return
+            seen.add(sig)
+
+            msg_type = getattr(msg, "type", None) or (msg.get("type") if isinstance(msg, dict) else "ai")
+            if msg_type in ("human", "user"):
+                m_type = MessageType.USER_INPUT
+            elif msg_type == "tool":
+                m_type = MessageType.TOOL_RESULT
+            else:
+                m_type = MessageType.AGENT_RESPONSE
+
+            await self._persist_message(
+                db, execution_id, content[:4000], m_type, from_agent=agent_name,
+            )
+            await event_bus.publish(exec_id_str, event_bus.make_event(
+                "message_persisted",
+                message=content[:500],
+                agent_name=agent_name,
+                message_type=m_type.value,
+            ))
+        except Exception as e:
+            logger.debug("Stream-persist skipped for %s: %s", agent_name, e)
 
     @staticmethod
     async def _persist_message(

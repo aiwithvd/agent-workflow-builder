@@ -18,12 +18,19 @@ router = APIRouter(prefix="/api/v1/settings", tags=["settings"])
 # key → (is_secret, description)
 KNOWN_SETTINGS: dict[str, tuple[bool, str]] = {
     "telegram_bot_token": (True, "Telegram bot token (from @BotFather)"),
+    "telegram_bot_username": (False, "Telegram bot username (without @)"),
     "openrouter_api_key": (True, "OpenRouter API key"),
     "ollama_url": (False, "Ollama server URL (e.g. http://localhost:11434)"),
+    "openai_api_key": (True, "OpenAI API key"),
+    "anthropic_api_key": (True, "Anthropic API key"),
+    "google_api_key": (True, "Google Gemini API key"),
+    "z_ai_api_key": (True, "Z.AI API key"),
+    "z_ai_base_url": (False, "Z.AI base URL (e.g. https://api.z.ai/v1)"),
     "openweather_api_key": (True, "OpenWeatherMap API key for weather tool"),
     "langfuse_public_key": (False, "Langfuse public key for tracing"),
     "langfuse_secret_key": (True, "Langfuse secret key for tracing"),
     "langfuse_host": (False, "Langfuse host URL"),
+    "langfuse_project": (False, "Langfuse project name"),
 }
 
 

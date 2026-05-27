@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { WorkflowCanvas } from "@/components/workflow/WorkflowCanvas";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { workflowsAPI } from "@/lib/api";
+import { workflowsAPI, agentsAPI } from "@/lib/api";
 import { useAgents } from "@/lib/hooks/useAgents";
 import { useWorkflowStore } from "@/lib/stores/workflowStore";
 import Link from "next/link";
@@ -20,6 +20,13 @@ function NewWorkflowContent() {
   const [description, setDescription] = useState("");
   const [saving, setSaving] = useState(false);
   const [templateLoading, setTemplateLoading] = useState(false);
+  const [presets, setPresets] = useState<any[]>([]);
+
+  useEffect(() => {
+    agentsAPI.presets().then((res) => {
+      if (res.data) setPresets(res.data as any[]);
+    });
+  }, []);
 
   // Pre-populate canvas from ?template= query param
   useEffect(() => {
@@ -49,6 +56,19 @@ function NewWorkflowContent() {
       setEdges(rawEdges.map((e: any) => ({ ...e, animated: true })));
     });
   }, [searchParams]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  async function handlePresetDropOnCanvas(preset: any) {
+    const res = await agentsAPI.create({
+      name: preset.name,
+      role: preset.role,
+      instructions: preset.instructions,
+      provider: preset.provider,
+      model: preset.model,
+      tools: preset.tools ?? [],
+    });
+    const agent = res.data as any;
+    return { agentId: agent.id, name: agent.name, role: agent.role, provider: agent.provider };
+  }
 
   async function handleSave() {
     if (!name.trim()) {
@@ -110,7 +130,7 @@ function NewWorkflowContent() {
 
       {/* Canvas */}
       <div className="flex-1 min-h-0">
-        <WorkflowCanvas agents={agents} />
+        <WorkflowCanvas agents={agents} presets={presets} onPresetDrop={handlePresetDropOnCanvas} />
       </div>
     </div>
   );

@@ -10,12 +10,12 @@ export function useWebSocket(executionId: string | null) {
   const [status, setStatus] = useState<WSStatus>("closed");
   const [messages, setMessages] = useState<any[]>([]);
 
-  const connect = useCallback(() => {
+  const connect = useCallback(async () => {
     if (!executionId) return;
     if (wsRef.current?.readyState === WebSocket.OPEN) return;
 
     setStatus("connecting");
-    const ws = createMonitorWebSocket(executionId);
+    const ws = await createMonitorWebSocket(executionId);
     wsRef.current = ws;
 
     ws.onopen = () => setStatus("open");

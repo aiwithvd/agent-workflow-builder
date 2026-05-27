@@ -1,5 +1,7 @@
 import asyncio
 import logging
+import time
+import uuid as _uuid
 from uuid import UUID
 
 import httpx
@@ -9,7 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.config import settings
-from app.database import get_db
+from app.database import get_db, async_session
 from app.enums import ExecutionStatus
 from app.models import Execution, Message, Workflow
 from app.runtime import event_bus
@@ -19,6 +21,27 @@ from app.schemas.execution import ExecutionCreate, ExecutionRead
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/v1/executions", tags=["executions"])
+
+# ─── WEBSOCKET TOKEN STORE ────────────────────────────────────────────────────
+# Short-lived (30 s) single-use tokens exchanged before WS connections.
+# This lets the Next.js proxy authenticate the HTTP leg, while the browser
+# connects the WS directly with a one-time token query param.
+
+_ws_tokens: dict[str, float] = {}  # token → expiry (unix timestamp)
+
+
+def _consume_ws_token(token: str) -> bool:
+    """Remove and validate a single-use WS token. Returns True if valid."""
+    exp = _ws_tokens.pop(token, None)
+    return exp is not None and time.time() < exp
+
+
+@router.post("/ws-token")
+async def issue_ws_token() -> dict:
+    """Issue a short-lived (30 s) token for WebSocket authentication."""
+    token = str(_uuid.uuid4())
+    _ws_tokens[token] = time.time() + 30
+    return {"token": token}
 
 
 def _to_read(execution: Execution) -> ExecutionRead:
@@ -128,19 +151,37 @@ async def get_execution_messages(execution_id: UUID, db: AsyncSession = Depends(
 
 # ─── LANGFUSE PROXY ───────────────────────────────────────────────────────────
 
-def _langfuse_auth() -> tuple[str, str]:
-    return (settings.langfuse_public_key, settings.langfuse_secret_key)
+async def _langfuse_creds() -> tuple[str, str, str]:
+    """Read Langfuse credentials from DB (Settings UI), falling back to env vars."""
+    from app.models.settings import PlatformSetting
+
+    try:
+        async with async_session() as db:
+            pk = await db.get(PlatformSetting, "langfuse_public_key")
+            sk = await db.get(PlatformSetting, "langfuse_secret_key")
+            host = await db.get(PlatformSetting, "langfuse_host")
+
+        public_key = pk.value if pk and pk.value else settings.langfuse_public_key
+        secret_key = sk.value if sk and sk.value else settings.langfuse_secret_key
+        host_url = host.value if host and host.value else settings.langfuse_host
+    except Exception:
+        public_key = settings.langfuse_public_key
+        secret_key = settings.langfuse_secret_key
+        host_url = settings.langfuse_host
+
+    return (public_key, secret_key, host_url)
 
 
 @router.get("/{execution_id}/traces")
 async def get_execution_traces(execution_id: UUID):
     """Proxy Langfuse traces for this execution (keyed by session_id)."""
     try:
+        public_key, secret_key, host_url = await _langfuse_creds()
         async with httpx.AsyncClient(timeout=10.0) as client:
             resp = await client.get(
-                f"{settings.langfuse_host}/api/public/traces",
+                f"{host_url}/api/public/traces",
                 params={"sessionId": str(execution_id), "limit": 50},
-                auth=_langfuse_auth(),
+                auth=(public_key, secret_key),
             )
             if resp.status_code == 200:
                 return resp.json()
@@ -158,12 +199,12 @@ async def get_execution_traces(execution_id: UUID):
 async def get_execution_metrics(execution_id: UUID):
     """Aggregate token counts and costs for an execution from Langfuse observations."""
     try:
+        public_key, secret_key, host_url = await _langfuse_creds()
         async with httpx.AsyncClient(timeout=10.0) as client:
-            # First get trace IDs for this session
             traces_resp = await client.get(
-                f"{settings.langfuse_host}/api/public/traces",
+                f"{host_url}/api/public/traces",
                 params={"sessionId": str(execution_id), "limit": 50},
-                auth=_langfuse_auth(),
+                auth=(public_key, secret_key),
             )
             if traces_resp.status_code != 200:
                 return _empty_metrics()
@@ -224,6 +265,15 @@ async def websocket_monitor(websocket: WebSocket, execution_id: UUID):
     disconnects.
     """
     await websocket.accept()
+
+    # Validate single-use token when a secret is configured.
+    # In local dev (no secret set) the token check is skipped entirely.
+    if settings.internal_api_secret:
+        token = websocket.query_params.get("token", "")
+        if not _consume_ws_token(token):
+            await websocket.close(code=1008)  # 1008 = Policy Violation
+            return
+
     exec_id_str = str(execution_id)
     q = event_bus.subscribe(exec_id_str)
 

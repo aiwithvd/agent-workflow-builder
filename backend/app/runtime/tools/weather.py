@@ -4,10 +4,14 @@ import httpx
 from langchain_core.tools import Tool
 
 from app.config import settings
+from app.runtime.sync_utils import get_platform_setting
 
 
 def get_weather_sync(city: str) -> str:
     """Get current weather for a city (synchronous, safe for tool use).
+
+    The API key is resolved from platform_settings DB first (Settings UI),
+    then falls back to the OPENWEATHERMAP_API_KEY environment variable.
 
     Args:
         city: City name (e.g., "London", "New York")
@@ -15,8 +19,9 @@ def get_weather_sync(city: str) -> str:
     Returns:
         Weather information or error message
     """
-    if not settings.openweathermap_api_key:
-        return "Error: OpenWeatherMap API key not configured"
+    api_key = get_platform_setting("openweathermap_api_key") or settings.openweathermap_api_key
+    if not api_key:
+        return "Weather tool is not configured. Add an OpenWeatherMap API key in Settings → Tools."
 
     try:
         with httpx.Client(timeout=10.0) as client:
@@ -24,7 +29,7 @@ def get_weather_sync(city: str) -> str:
                 "https://api.openweathermap.org/data/2.5/weather",
                 params={
                     "q": city,
-                    "appid": settings.openweathermap_api_key,
+                    "appid": api_key,
                     "units": "metric",
                 },
             )

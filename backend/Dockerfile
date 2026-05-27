@@ -17,6 +17,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY . .
 
+# Run as non-root
+RUN adduser --disabled-password --no-create-home appuser && \
+    chown -R appuser:appuser /app
+USER appuser
+
 # Expose port
 EXPOSE 8000
 

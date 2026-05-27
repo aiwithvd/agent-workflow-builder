@@ -1,8 +1,10 @@
 import logging
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.config import settings
 from app.routers import agents, workflows, executions
@@ -12,6 +14,35 @@ from app.scheduler import agent_scheduler, load_all_schedules
 from app.services.trigger_activator import activate_workflow_triggers
 
 logger = logging.getLogger(__name__)
+
+# Paths that bypass the secret check (public health + docs)
+_OPEN_PATHS = {"/health", "/", "/docs", "/openapi.json", "/redoc"}
+
+
+class InternalSecretMiddleware(BaseHTTPMiddleware):
+    """Reject requests that don't carry the correct X-Internal-Secret header.
+
+    Only active when ``settings.internal_api_secret`` is non-empty so that
+    local development works out of the box without any configuration.
+    """
+
+    async def dispatch(self, request: Request, call_next):
+        secret = settings.internal_api_secret
+        if secret and request.url.path not in _OPEN_PATHS:
+            if request.headers.get("X-Internal-Secret") != secret:
+                return JSONResponse({"detail": "Unauthorized"}, status_code=401)
+        return await call_next(request)
+
+
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    """Add standard security response headers to every reply."""
+
+    async def dispatch(self, request: Request, call_next):
+        response = await call_next(request)
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        return response
 
 
 async def _sync_all_workflow_triggers() -> None:
@@ -60,10 +91,18 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS middleware
+# Security middlewares (outermost first — security headers wrap everything)
+app.add_middleware(SecurityHeadersMiddleware)
+app.add_middleware(InternalSecretMiddleware)
+
+# CORS — restrict to known origins; wildcard + credentials is invalid per spec
+_cors_origins = ["http://localhost:4000", "http://localhost:3001", "http://localhost:3000"]
+if settings.frontend_url:
+    _cors_origins.append(settings.frontend_url)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=_cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

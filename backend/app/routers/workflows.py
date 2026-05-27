@@ -4,11 +4,11 @@ from pathlib import Path
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import select
+from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.models import Workflow
+from app.models import Workflow, Execution, Message
 from app.schemas.workflow import WorkflowCreate, WorkflowRead, WorkflowUpdate
 from app.scheduler import sync_schedule_triggers
 from app.services.trigger_activator import activate_workflow_triggers, deactivate_workflow_triggers
@@ -128,8 +128,14 @@ async def delete_workflow(workflow_id: UUID, db: AsyncSession = Depends(get_db))
             status_code=status.HTTP_404_NOT_FOUND, detail="Workflow not found"
         )
 
+    # Delete child rows in FK order (no CASCADE on these constraints)
+    exec_ids_subq = select(Execution.id).where(Execution.workflow_id == workflow_id)
+    await db.execute(delete(Message).where(Message.execution_id.in_(exec_ids_subq)))
+    await db.execute(delete(Execution).where(Execution.workflow_id == workflow_id))
+
+    # workflow_triggers cascade via DB-level ondelete="CASCADE"
     await db.delete(db_workflow)
     await db.commit()
 
-    # Remove trigger DB rows + APScheduler jobs after commit
+    # Remove APScheduler jobs after commit
     await deactivate_workflow_triggers(workflow_id)

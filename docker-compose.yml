@@ -12,8 +12,6 @@ services:
       - ./backend:/app
       - agent_files:/app/files
     command: sh -c "python -m alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
-    depends_on:
-      - langfuse
     environment:
       LANGFUSE_HOST: http://langfuse:3000
       OTEL_SDK_DISABLED: "true"
@@ -41,28 +39,12 @@ services:
       - "4000:3000"
     env_file: .env
     environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
+      # BACKEND_URL uses the Docker service name — never exposed to the browser
+      - BACKEND_URL=http://backend:8000
+      # WS is still direct-to-backend from the browser; use localhost for local dev
       - NEXT_PUBLIC_WS_URL=ws://localhost:8000/api/v1
-      - NEXT_PUBLIC_LANGGRAPH_URL=http://localhost:8123
     depends_on:
       - backend
-    networks:
-      - agent-orchestration-network
-
-  langfuse-db:
-    image: postgres:15-alpine
-    environment:
-      POSTGRES_USER: langfuse
-      POSTGRES_PASSWORD: langfuse
-      POSTGRES_DB: langfuse
-    volumes:
-      - langfuse_db:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U langfuse -d langfuse"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-      start_period: 10s
     networks:
       - agent-orchestration-network
 
@@ -71,16 +53,15 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - DATABASE_URL=postgresql://langfuse:langfuse@langfuse-db:5432/langfuse
+      # Use Supabase Session Pooler URL (port 5432, not 6543) + sslmode=require
+      # Set LANGFUSE_DATABASE_URL in your .env file.
+      - DATABASE_URL=${LANGFUSE_DATABASE_URL}
       - NEXTAUTH_URL=http://localhost:3000
       - NEXTAUTH_SECRET=${LANGFUSE_NEXTAUTH_SECRET:-changeme-langfuse-secret-32chars!!}
       - SALT=${LANGFUSE_SALT:-changeme-langfuse-salt-value-here}
       - TELEMETRY_ENABLED=false
       - NEXT_PUBLIC_SIGN_UP_DISABLED=false
       - LANGFUSE_ENABLE_EXPERIMENTAL_FEATURES=false
-    depends_on:
-      langfuse-db:
-        condition: service_healthy
     networks:
       - agent-orchestration-network
 
@@ -125,7 +106,6 @@ services:
 
 volumes:
   agent_files:
-  langfuse_db:
 
 networks:
   agent-orchestration-network:

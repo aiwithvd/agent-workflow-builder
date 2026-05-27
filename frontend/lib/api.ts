@@ -1,8 +1,14 @@
 /**
- * API client utilities for backend communication
+ * API client utilities for backend communication.
+ *
+ * All HTTP traffic goes through the Next.js proxy at /api/backend so that
+ * the backend URL and shared secret never reach the browser.
+ * WebSocket connections are still direct (browsers can't proxy WS through
+ * serverless functions), but they use a short-lived token obtained via the
+ * proxy before connecting.
  */
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
+const API_URL = "/api/backend";
 
 interface ApiResponse<T> {
   data?: T;
@@ -119,12 +125,41 @@ export const settingsAPI = {
       method: "PATCH",
       body: JSON.stringify({ settings }),
     }),
+  getRaw: (key: string) => apiCall<{ key: string; value: string | null }>(`/settings/${key}/raw`),
 };
 
-// WebSocket for monitoring
-export function createMonitorWebSocket(executionId: string): WebSocket {
-  const wsUrl =
-    (process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8000/api/v1") +
-    `/executions/ws/monitor/${executionId}`;
-  return new WebSocket(wsUrl);
+// ─── WebSocket helpers ────────────────────────────────────────────────────────
+
+/**
+ * Fetch a short-lived (30 s) single-use WS token from the backend via the
+ * Next.js proxy.  Returns an empty string when the backend has no secret
+ * configured (local development), so callers can always await this safely.
+ */
+async function getWsToken(): Promise<string> {
+  try {
+    const res = await fetch("/api/backend/executions/ws-token", {
+      method: "POST",
+    });
+    if (!res.ok) return "";
+    const data = await res.json();
+    return (data as { token?: string }).token ?? "";
+  } catch {
+    return "";
+  }
+}
+
+/**
+ * Open a monitored WebSocket for an execution.  Fetches a short-lived auth
+ * token first so the backend can validate the connection.
+ */
+export async function createMonitorWebSocket(
+  executionId: string
+): Promise<WebSocket> {
+  const token = await getWsToken();
+  const wsBase =
+    process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8000/api/v1";
+  const tokenParam = token ? `?token=${encodeURIComponent(token)}` : "";
+  return new WebSocket(
+    `${wsBase}/executions/ws/monitor/${executionId}${tokenParam}`
+  );
 }
