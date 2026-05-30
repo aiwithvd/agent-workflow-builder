@@ -116,13 +116,12 @@ def build_graph_from_definition(
         agent_cfg = agents_config.get(node_id)
 
         if not agent_cfg:
-            logger.warning("No agent config for node %s — skipping", node_id)
-            continue
+            raise ValueError(f"Node '{node_id}' has no agent assigned — assign an agent before running the workflow")
 
         try:
             llm = create_llm(
                 agent_cfg.get("provider", LLMProvider.OLLAMA),
-                agent_cfg.get("model", "llama3.2"),
+                agent_cfg.get("model", "meta-llama/llama-3.2-3b-instruct:free"),
                 temperature=agent_cfg.get("temperature"),
                 top_p=agent_cfg.get("top_p"),
                 presence_penalty=agent_cfg.get("presence_penalty"),

@@ -41,13 +41,14 @@ def _serialize_for_db(obj):
 
 
 async def _get_langfuse_handler(execution_id: str):
-    """Return a Langfuse v3 CallbackHandler tagged with the execution_id.
+    """Return a Langfuse CallbackHandler tagged with the execution_id.
 
     Reads credentials from the PlatformSetting DB table (set via Settings UI),
     falling back to env vars. Returns None if credentials are missing or the
     Langfuse SDK is unavailable so the executor degrades gracefully.
     """
     try:
+        from langfuse import Langfuse
         from langfuse.langchain import CallbackHandler
         from app.models.settings import PlatformSetting
 
@@ -70,12 +71,15 @@ async def _get_langfuse_handler(execution_id: str):
             logger.warning("Langfuse unavailable, tracing disabled: credentials not set")
             return None
 
-        return CallbackHandler(
+        Langfuse(
             public_key=public_key,
             secret_key=secret_key,
             host=host_url or "http://langfuse:3000",
-            session_id=execution_id,
-            trace_name=f"execution-{execution_id[:8]}",
+        )
+
+        return CallbackHandler(
+            public_key=public_key,
+            trace_context={"trace_id": execution_id.replace("-", "")},
         )
     except Exception as e:
         logger.warning("Langfuse unavailable, tracing disabled: %s", e)
@@ -474,7 +478,6 @@ class ExecutionService:
         except Exception as e:
             logger.warning("Webhook delivery to %s failed: %s", webhook_url, e)
 
-    @staticmethod
     async def _stream_persist_message(
         self,
         db: AsyncSession,

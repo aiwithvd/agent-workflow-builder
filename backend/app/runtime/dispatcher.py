@@ -162,13 +162,12 @@ def _cached_uncompiled_graph(workflow_id: str, version: int = 0) -> StateGraph:
         node_id = node["id"]
         agent_cfg = agents_config.get(node_id)
         if not agent_cfg:
-            logger.warning("No agent config for node %s — skipping", node_id)
-            continue
+            raise ValueError(f"Node '{node_id}' has no agent assigned — assign an agent before running the workflow")
 
         try:
             llm = create_llm(
                 agent_cfg.get("provider", LLMProvider.OLLAMA),
-                agent_cfg.get("model", "llama3.2"),
+                agent_cfg.get("model", "meta-llama/llama-3.2-3b-instruct:free"),
             )
         except Exception as exc:
             raise ValueError(f"Cannot create LLM for node '{node_id}': {exc}") from exc
